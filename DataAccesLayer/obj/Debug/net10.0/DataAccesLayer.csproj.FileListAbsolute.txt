@@ -14,3 +14,5 @@ C:\Users\Jamal\OneDrive\individual project\individual project\DataAccesLayer\obj
 C:\Users\Jamal\OneDrive\individual project\individual project\DataAccesLayer\obj\Debug\net10.0\refint\DataAccesLayer.dll
 C:\Users\Jamal\OneDrive\individual project\individual project\DataAccesLayer\obj\Debug\net10.0\DataAccesLayer.pdb
 C:\Users\Jamal\OneDrive\individual project\individual project\DataAccesLayer\obj\Debug\net10.0\ref\DataAccesLayer.dll
+C:\Users\Jamal\OneDrive\individual project\individual project\DataAccesLayer\bin\Debug\net10.0\DataAccesLayer.runtimeconfig.json
+C:\Users\Jamal\OneDrive\individual project\individual project\DataAccesLayer\obj\Debug\net10.0\DataAccesLayer.genruntimeconfig.cache
