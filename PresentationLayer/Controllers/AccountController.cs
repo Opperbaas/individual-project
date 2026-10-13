@@ -1,3 +1,8 @@
+using System.Security.Claims;
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,15 +12,15 @@ namespace PresentationLayer.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly IAccountRepository _accountRepository;
+    private readonly IPasswordHasher<AccountUserRecord> _passwordHasher;
 
     public AccountController(
-        SignInManager<IdentityUser> signInManager,
-        UserManager<IdentityUser> userManager)
+        IAccountRepository accountRepository,
+        IPasswordHasher<AccountUserRecord> passwordHasher)
     {
-        _signInManager = signInManager;
-        _userManager = userManager;
+        _accountRepository = accountRepository;
+        _passwordHasher = passwordHasher;
     }
 
     [HttpGet]
@@ -40,14 +45,14 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var result = await _signInManager.PasswordSignInAsync(
-            model.Email,
-            model.Password,
-            model.RememberMe,
-            lockoutOnFailure: false);
-
-        if (result.Succeeded)
+        var user = await _accountRepository.FindByEmailAsync(model.Email);
+        if (user is not null && _passwordHasher.VerifyHashedPassword(
+                user,
+                user.PasswordHash,
+                model.Password) != PasswordVerificationResult.Failed)
         {
+            await SignInUserAsync(user, model.RememberMe);
+
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
@@ -77,32 +82,68 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var user = new IdentityUser
+        if (await _accountRepository.EmailExistsAsync(model.Email))
         {
-            UserName = model.Email,
+            ModelState.AddModelError(nameof(model.Email), "Er bestaat al een account met dit e-mailadres.");
+            return View(model);
+        }
+
+        var user = new AccountUserRecord
+        {
+            Name = model.Name,
             Email = model.Email
         };
+        var passwordHash = _passwordHasher.HashPassword(user, model.Password);
 
-        var result = await _userManager.CreateAsync(user, model.Password);
-        if (result.Succeeded)
+        try
         {
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectToAction("Index", "Home");
+            await _accountRepository.CreateAsync(model.Name, model.Email, passwordHash);
+        }
+        catch (InvalidOperationException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            return View(model);
         }
 
-        foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError(string.Empty, error.Description);
-        }
-
-        return View(model);
+        user = (await _accountRepository.FindByEmailAsync(model.Email))!;
+        await SignInUserAsync(user, isPersistent: false);
+        return RedirectToAction("Index", "Home");
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
+    }
+
+    private async Task SignInUserAsync(AccountUserRecord user, bool isPersistent)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new(ClaimTypes.Name, user.Name),
+            new(ClaimTypes.Email, user.Email)
+        };
+
+        if (!string.IsNullOrWhiteSpace(user.RoleName))
+        {
+            claims.Add(new Claim(ClaimTypes.Role, user.RoleName));
+        }
+
+        var identity = new ClaimsIdentity(
+            claims,
+            CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        var properties = new AuthenticationProperties
+        {
+            IsPersistent = isPersistent
+        };
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            properties);
     }
 }

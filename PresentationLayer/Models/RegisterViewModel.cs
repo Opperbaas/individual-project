@@ -4,10 +4,13 @@ namespace PresentationLayer.Models;
 
 public class RegisterViewModel
 {
+    [Required, StringLength(100)]
+    public string Name { get; set; } = "";
+
     [Required, EmailAddress]
     public string Email { get; set; } = "";
 
-    [Required, DataType(DataType.Password), MinLength(6)]
+    [Required, DataType(DataType.Password), MinLength(8)]
     public string Password { get; set; } = "";
 
     [Required, DataType(DataType.Password)]

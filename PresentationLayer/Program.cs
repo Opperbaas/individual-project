@@ -1,4 +1,8 @@
+using BusinessLayer.DTOs;
+using BusinessLayer.Interfaces;
 using DataAccesLayer.Database;
+using DataAccesLayer.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +14,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IAccountRepository, SqlAccountRepository>();
+builder.Services.AddScoped<IPasswordHasher<AccountUserRecord>, PasswordHasher<AccountUserRecord>>();
 builder.Services
-    .AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/Login";
+    });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
