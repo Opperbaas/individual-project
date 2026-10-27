@@ -1,7 +1,9 @@
+using BusinessLayer.Entities;
 using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
 using DataAccesLayer.Database;
 using Microsoft.EntityFrameworkCore;
+using BusinessLayer.Enums;
 
 namespace DataAccesLayer.Repositories;
 
@@ -38,7 +40,7 @@ public sealed class SqlAccountRepository : IAccountRepository
     public async Task CreateAsync(string name, string email, string passwordHash)
     {
         var roleId = await _dbContext.Roles
-            .Where(role => role.Name == "User")
+            .Where(role => role.Name == RoleType.User.ToString())
             .Select(role => (int?)role.RoleId)
             .SingleOrDefaultAsync();
 
@@ -47,7 +49,7 @@ public sealed class SqlAccountRepository : IAccountRepository
             throw new InvalidOperationException("De standaardrol 'User' ontbreekt in dbo.Role.");
         }
 
-        _dbContext.Users.Add(new PlannerUser
+        _dbContext.Users.Add(new User
         {
             RoleId = roleId.Value,
             Name = name,

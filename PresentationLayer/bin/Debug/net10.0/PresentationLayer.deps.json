@@ -10,6 +10,7 @@
         "dependencies": {
           "BusinessLayer": "1.0.0",
           "DataAccesLayer": "1.0.0",
+          "Microsoft.EntityFrameworkCore": "10.0.12",
           "Microsoft.EntityFrameworkCore.Design": "10.0.12"
         },
         "runtime": {

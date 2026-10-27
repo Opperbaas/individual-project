@@ -21,7 +21,7 @@ namespace DataAccesLayer.Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DataAccesLayer.Database.PlannerRole", b =>
+            modelBuilder.Entity("BusinessLayer.Entities.Role", b =>
                 {
                     b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
@@ -43,7 +43,7 @@ namespace DataAccesLayer.Database.Migrations
                     b.ToTable("Role", (string)null);
                 });
 
-            modelBuilder.Entity("DataAccesLayer.Database.PlannerUser", b =>
+            modelBuilder.Entity("BusinessLayer.Entities.User", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
@@ -76,9 +76,9 @@ namespace DataAccesLayer.Database.Migrations
                     b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("DataAccesLayer.Database.PlannerUser", b =>
+            modelBuilder.Entity("BusinessLayer.Entities.User", b =>
                 {
-                    b.HasOne("DataAccesLayer.Database.PlannerRole", "Role")
+                    b.HasOne("BusinessLayer.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -87,7 +87,7 @@ namespace DataAccesLayer.Database.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("DataAccesLayer.Database.PlannerRole", b =>
+            modelBuilder.Entity("BusinessLayer.Entities.Role", b =>
                 {
                     b.Navigation("Users");
                 });
