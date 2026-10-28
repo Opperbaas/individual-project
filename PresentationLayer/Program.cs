@@ -1,5 +1,6 @@
 using BusinessLayer.DTOs;
 using BusinessLayer.Interfaces;
+using BusinessLayer.Services;
 using DataAccesLayer.Database;
 using DataAccesLayer.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -15,6 +16,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAccountRepository, SqlAccountRepository>();
+builder.Services.AddScoped<IPlanningRepository, SqlPlanningRepository>();
+builder.Services.AddScoped<PlanningService>();
 builder.Services.AddScoped<IPasswordHasher<AccountUserRecord>, PasswordHasher<AccountUserRecord>>();
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
