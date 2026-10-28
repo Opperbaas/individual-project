@@ -1,0 +1,74 @@
+@model BusinessLayer.Entities.Planning
+
+@{
+    ViewData["Title"] = "Planning details";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>@Model.Name</h1>
+        <p class="text-muted mb-0">Details van de planning.</p>
+    </div>
+    <span class="badge text-bg-secondary fs-6">@Model.Status</span>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Evenement</dt>
+            <dd class="col-sm-9">@Model.Event.EventName</dd>
+
+            <dt class="col-sm-3">Aangemaakt op</dt>
+            <dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("dd-MM-yyyy HH:mm")</dd>
+
+            <dt class="col-sm-3">AI gegenereerd</dt>
+            <dd class="col-sm-9">@(Model.IsAiGenerated ? "Ja" : "Nee")</dd>
+        </dl>
+    </div>
+</div>
+
+<h2 class="h4">Activiteiten</h2>
+
+@if (Model.ActivitySchedules.Count == 0)
+{
+    <div class="alert alert-info">
+        Er zijn nog geen activiteiten ingepland.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Activiteit</th>
+                    <th>Locatie</th>
+                    <th>Datum</th>
+                    <th>Tijd</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var schedule in Model.ActivitySchedules)
+                {
+                    <tr>
+                        <td>@schedule.Activity.ActivityName</td>
+                        <td>@schedule.Location.Name</td>
+                        <td>@schedule.TimeSlot.SlotDate.ToString("dd-MM-yyyy")</td>
+                        <td>
+                            @schedule.TimeSlot.StartTime.ToString("HH:mm")
+                            -
+                            @schedule.TimeSlot.EndTime.ToString("HH:mm")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<a class="btn btn-outline-secondary"
+   asp-controller="Planning"
+   asp-action="Index"
+   asp-route-eventId="@Model.EventId">
+    Terug naar planningen
+</a>
