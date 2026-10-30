@@ -1,0 +1,48 @@
+@model PresentationLayer.Models.CreateActivityViewModel
+
+@{
+    ViewData["Title"] = "Activiteit toevoegen";
+}
+
+<h1>Activiteit toevoegen</h1>
+
+<form asp-controller="Activity" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="EventId" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="ActivityName" class="form-label"></label>
+        <input asp-for="ActivityName" class="form-control" />
+        <span asp-validation-for="ActivityName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ActivityType" class="form-label"></label>
+        <input asp-for="ActivityType" class="form-control" />
+        <span asp-validation-for="ActivityType" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="MaxParticipants" class="form-label"></label>
+        <input asp-for="MaxParticipants" type="number" min="1" class="form-control" />
+        <span asp-validation-for="MaxParticipants" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Activiteit toevoegen</button>
+    <a asp-controller="Planning" asp-action="Index"
+       asp-route-eventId="@Model.EventId"
+       class="btn btn-outline-secondary">
+        Annuleren
+    </a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
