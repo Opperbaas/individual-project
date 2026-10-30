@@ -9,6 +9,15 @@
         <h1>Planningen</h1>
         <p class="text-muted mb-0">Overzicht van de planningen voor dit evenement.</p>
     </div>
+    @if (User.IsInRole("Organizer"))
+    {
+        <a class="btn btn-primary"
+           asp-controller="Planning"
+           asp-action="Create"
+           asp-route-eventId="@Context.Request.Query["eventId"]">
+            Planning aanmaken
+        </a>
+    }
 </div>
 
 @if (Model.Count == 0)

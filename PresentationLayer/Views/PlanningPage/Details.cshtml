@@ -12,11 +12,24 @@
     <span class="badge text-bg-secondary fs-6">@Model.Status</span>
 </div>
 
+@if (User.IsInRole("Organizer"))
+{
+    <a class="btn btn-outline-primary mb-4"
+       asp-controller="Planning"
+       asp-action="Edit"
+       asp-route-id="@Model.PlanningId">
+        Planning bewerken
+    </a>
+}
+
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <dl class="row mb-0">
             <dt class="col-sm-3">Evenement</dt>
             <dd class="col-sm-9">@Model.Event.EventName</dd>
+
+            <dt class="col-sm-3">Organisator</dt>
+            <dd class="col-sm-9">@Model.CreatedByUser.Name</dd>
 
             <dt class="col-sm-3">Aangemaakt op</dt>
             <dd class="col-sm-9">@Model.CreatedAt.ToLocalTime().ToString("dd-MM-yyyy HH:mm")</dd>
@@ -42,9 +55,12 @@ else
             <thead>
                 <tr>
                     <th>Activiteit</th>
+                    <th>Type</th>
                     <th>Locatie</th>
                     <th>Datum</th>
                     <th>Tijd</th>
+                    <th>Deelnemers</th>
+                    <th>Vrijwilligers</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,12 +68,32 @@ else
                 {
                     <tr>
                         <td>@schedule.Activity.ActivityName</td>
+                        <td>@schedule.Activity.ActivityType</td>
                         <td>@schedule.Location.Name</td>
                         <td>@schedule.TimeSlot.SlotDate.ToString("dd-MM-yyyy")</td>
                         <td>
                             @schedule.TimeSlot.StartTime.ToString("HH:mm")
                             -
                             @schedule.TimeSlot.EndTime.ToString("HH:mm")
+                        </td>
+                        <td>
+                            @schedule.Activity.Registrations.Count /
+                            @schedule.Activity.MaxParticipants
+                        </td>
+                        <td>
+                            @if (schedule.Activity.VolunteerAssignments.Count == 0)
+                            {
+                                <span class="text-muted">Geen</span>
+                            }
+                            else
+                            {
+                                <ul class="mb-0 ps-3">
+                                    @foreach (var assignment in schedule.Activity.VolunteerAssignments)
+                                    {
+                                        <li>@assignment.User.Name</li>
+                                    }
+                                </ul>
+                            }
                         </td>
                     </tr>
                 }

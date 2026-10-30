@@ -50,7 +50,10 @@ public class ApplicationDbContext : DbContext
         {
             entity.ToTable("Location");
             entity.HasKey(location => location.LocationId);
-            entity.Property(location => location.Name).HasMaxLength(200).IsRequired();
+            entity.Property(location => location.Name)
+                .HasColumnName("LocationName")
+                .HasMaxLength(200)
+                .IsRequired();
             entity.Property(location => location.LocationType).HasMaxLength(100).IsRequired();
             entity.Property(location => location.Description).HasMaxLength(1000).IsRequired();
         });

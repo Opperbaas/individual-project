@@ -1,0 +1,91 @@
+@model PresentationLayer.Models.CreatePlanningViewModel
+
+@{
+    ViewData["Title"] = "Planning aanmaken";
+}
+
+<h1>Planning aanmaken</h1>
+
+<form asp-controller="Planning" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="EventId" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <h2 class="h4 mt-4">Activiteitenschema's</h2>
+
+    @if (Model.Schedules.Count == 0)
+    {
+        <div class="alert alert-info">
+            Er zijn nog geen activiteitenschema's toegevoegd.
+        </div>
+    }
+    else
+    {
+        @for (var index = 0; index < Model.Schedules.Count; index++)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Schedules[index].ActivityId" class="form-label"></label>
+                        <select asp-for="Schedules[index].ActivityId"
+                                asp-items="Model.Schedules[index].Activities"
+                                class="form-select">
+                            <option value="">Kies een activiteit</option>
+                        </select>
+                        <span asp-validation-for="Schedules[index].ActivityId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Schedules[index].LocationId" class="form-label"></label>
+                        <select asp-for="Schedules[index].LocationId"
+                                asp-items="Model.Schedules[index].Locations"
+                                class="form-select">
+                            <option value="">Kies een locatie</option>
+                        </select>
+                        <span asp-validation-for="Schedules[index].LocationId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Schedules[index].TimeSlotId" class="form-label"></label>
+                        <select asp-for="Schedules[index].TimeSlotId"
+                                asp-items="Model.Schedules[index].TimeSlots"
+                                class="form-select">
+                            <option value="">Kies een tijdslot</option>
+                        </select>
+                        <span asp-validation-for="Schedules[index].TimeSlotId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Schedules[index].VolunteerIds" class="form-label"></label>
+                        <select asp-for="Schedules[index].VolunteerIds"
+                                asp-items="Model.Schedules[index].Volunteers"
+                                class="form-select"
+                                multiple>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    <button type="submit" class="btn btn-primary">Planning aanmaken</button>
+    <a asp-controller="Planning"
+       asp-action="Index"
+       asp-route-eventId="@Model.EventId"
+       class="btn btn-outline-secondary">
+        Annuleren
+    </a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
