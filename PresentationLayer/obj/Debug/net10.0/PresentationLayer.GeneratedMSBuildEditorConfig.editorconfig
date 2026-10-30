@@ -42,6 +42,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWN0aXZpdHlcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Jamal/OneDrive/individual project/individual project/PresentationLayer/Views/Availability/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXZhaWxhYmlsaXR5XENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Jamal/OneDrive/individual project/individual project/PresentationLayer/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -80,6 +84,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Jamal/OneDrive/individual project/individual project/PresentationLayer/Views/SportEvent/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3BvcnRFdmVudFxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Jamal/OneDrive/individual project/individual project/PresentationLayer/Views/TimeSlot/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGltZVNsb3RcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Jamal/OneDrive/individual project/individual project/PresentationLayer/Views/_ViewImports.cshtml]

@@ -1,0 +1,42 @@
+@model PresentationLayer.Models.CreateTimeSlotViewModel
+
+@{
+    ViewData["Title"] = "Tijdslot toevoegen";
+}
+
+<h1>Tijdslot toevoegen</h1>
+
+<form asp-controller="TimeSlot" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="EventId" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="SlotDate" class="form-label"></label>
+        <input asp-for="SlotDate" type="date" class="form-control" />
+        <span asp-validation-for="SlotDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StartTime" class="form-label"></label>
+        <input asp-for="StartTime" type="time" class="form-control" />
+        <span asp-validation-for="StartTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EndTime" class="form-label"></label>
+        <input asp-for="EndTime" type="time" class="form-control" />
+        <span asp-validation-for="EndTime" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Tijdslot toevoegen</button>
+    <a asp-controller="Planning" asp-action="Index"
+       asp-route-eventId="@Model.EventId"
+       class="btn btn-outline-secondary">
+        Annuleren
+    </a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

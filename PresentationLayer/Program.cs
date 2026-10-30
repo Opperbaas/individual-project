@@ -20,11 +20,15 @@ builder.Services.AddScoped<IPlanningRepository, SqlPlanningRepository>();
 builder.Services.AddScoped<ISportEventRepository, SqlSportEventRepository>();
 builder.Services.AddScoped<IActivityRepository, SqlActivityRepository>();
 builder.Services.AddScoped<ILocationRepository, SqlLocationRepository>();
+builder.Services.AddScoped<ITimeSlotRepository, SqlTimeSlotRepository>();
+builder.Services.AddScoped<IAvailabilityRepository, SqlAvailabilityRepository>();
 builder.Services.AddScoped<ScheduleValidationService>();
 builder.Services.AddScoped<PlanningService>();
 builder.Services.AddScoped<SportEventService>();
 builder.Services.AddScoped<ActivityService>();
 builder.Services.AddScoped<LocationService>();
+builder.Services.AddScoped<TimeSlotService>();
+builder.Services.AddScoped<AvailabilityService>();
 builder.Services.AddScoped<IPasswordHasher<AccountUserRecord>, PasswordHasher<AccountUserRecord>>();
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
