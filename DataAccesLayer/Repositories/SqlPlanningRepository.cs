@@ -50,10 +50,17 @@ public sealed class SqlPlanningRepository : IPlanningRepository
     {
         return _dbContext.Plannings
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(planning => planning.Event)
             .Include(planning => planning.CreatedByUser)
             .Include(planning => planning.ActivitySchedules)
                 .ThenInclude(schedule => schedule.Activity)
+                    .ThenInclude(activity => activity.Registrations)
+                        .ThenInclude(registration => registration.User)
+            .Include(planning => planning.ActivitySchedules)
+                .ThenInclude(schedule => schedule.Activity)
+                    .ThenInclude(activity => activity.VolunteerAssignments)
+                        .ThenInclude(assignment => assignment.User)
             .Include(planning => planning.ActivitySchedules)
                 .ThenInclude(schedule => schedule.Location)
             .Include(planning => planning.ActivitySchedules)
