@@ -1,0 +1,41 @@
+@model PresentationLayer.Models.CreateAvailabilityViewModel
+
+@{
+    ViewData["Title"] = "Beschikbaarheid invoeren";
+}
+
+<h1>Beschikbaarheid invoeren</h1>
+
+<p>Geef aan wanneer je beschikbaar bent als vrijwilliger.</p>
+
+<form asp-controller="Availability" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="AvailableDate" class="form-label"></label>
+        <input asp-for="AvailableDate" type="date" class="form-control" />
+        <span asp-validation-for="AvailableDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StartTime" class="form-label"></label>
+        <input asp-for="StartTime" type="time" class="form-control" />
+        <span asp-validation-for="StartTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EndTime" class="form-label"></label>
+        <input asp-for="EndTime" type="time" class="form-control" />
+        <span asp-validation-for="EndTime" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Beschikbaarheid opslaan</button>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+        Annuleren
+    </a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
