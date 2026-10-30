@@ -6,10 +6,14 @@ namespace BusinessLayer.Services;
 public sealed class PlanningService
 {
     private readonly IPlanningRepository _planningRepository;
+    private readonly ScheduleValidationService _scheduleValidationService;
 
-    public PlanningService(IPlanningRepository planningRepository)
+    public PlanningService(
+        IPlanningRepository planningRepository,
+        ScheduleValidationService scheduleValidationService)
     {
         _planningRepository = planningRepository;
+        _scheduleValidationService = scheduleValidationService;
     }
 
     public Task<Planning?> GetByIdAsync(int planningId)
@@ -36,6 +40,7 @@ public sealed class PlanningService
     {
         ArgumentNullException.ThrowIfNull(planning);
         ValidatePlanning(planning);
+        EnsureValidSchedule(planning);
 
         planning.CreatedAt = DateTime.UtcNow;
         if (string.IsNullOrWhiteSpace(planning.Status))
@@ -50,6 +55,7 @@ public sealed class PlanningService
     {
         ArgumentNullException.ThrowIfNull(planning);
         ValidatePlanning(planning);
+        EnsureValidSchedule(planning);
 
         var existingPlanning = await _planningRepository.GetByIdAsync(planning.PlanningId);
         if (existingPlanning is null)
@@ -59,6 +65,55 @@ public sealed class PlanningService
         }
 
         await _planningRepository.UpdateAsync(planning);
+    }
+
+    public async Task<IReadOnlyList<string>> ValidateAsync(int planningId)
+    {
+        var planning = await GetExistingPlanningAsync(planningId);
+        return _scheduleValidationService.Validate(planning);
+    }
+
+    public async Task FinalizeAsync(int planningId)
+    {
+        var planning = await GetExistingPlanningAsync(planningId);
+        var validationErrors = _scheduleValidationService.Validate(planning);
+
+        if (validationErrors.Count > 0)
+        {
+            throw new InvalidOperationException(
+                $"De planning kan niet definitief worden gemaakt: {string.Join(" ", validationErrors)}");
+        }
+
+        planning.Status = "Final";
+        await _planningRepository.UpdateAsync(planning);
+    }
+
+    private async Task<Planning> GetExistingPlanningAsync(int planningId)
+    {
+        if (planningId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(planningId));
+        }
+
+        var planning = await _planningRepository.GetByIdAsync(planningId);
+        if (planning is null)
+        {
+            throw new KeyNotFoundException(
+                $"Planning met ID {planningId} bestaat niet.");
+        }
+
+        return planning;
+    }
+
+    private void EnsureValidSchedule(Planning planning)
+    {
+        var validationErrors = _scheduleValidationService.Validate(planning);
+        if (validationErrors.Count > 0)
+        {
+            throw new ArgumentException(
+                $"De planning bevat conflicten: {string.Join(" ", validationErrors)}",
+                nameof(planning));
+        }
     }
 
     private static void ValidatePlanning(Planning planning)

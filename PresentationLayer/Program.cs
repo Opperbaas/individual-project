@@ -17,6 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IAccountRepository, SqlAccountRepository>();
 builder.Services.AddScoped<IPlanningRepository, SqlPlanningRepository>();
+builder.Services.AddScoped<ScheduleValidationService>();
 builder.Services.AddScoped<PlanningService>();
 builder.Services.AddScoped<IPasswordHasher<AccountUserRecord>, PasswordHasher<AccountUserRecord>>();
 builder.Services
