@@ -79,6 +79,23 @@ else
                         <td>
                             @schedule.Activity.Registrations.Count /
                             @schedule.Activity.MaxParticipants
+                            @if (User.IsInRole("Participant"))
+                            {
+                                <form asp-controller="Registration"
+                                      asp-action="Create"
+                                      method="post"
+                                      class="mt-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="activityId"
+                                           value="@schedule.Activity.ActivityId" />
+                                    <input type="hidden" name="planningId"
+                                           value="@Model.PlanningId" />
+                                    <button type="submit"
+                                            class="btn btn-sm btn-primary">
+                                        Registreren
+                                    </button>
+                                </form>
+                            }
                         </td>
                         <td>
                             @if (schedule.Activity.VolunteerAssignments.Count == 0)
