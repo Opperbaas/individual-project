@@ -1,6 +1,7 @@
 using BusinessLayer.Entities;
 using BusinessLayer.Interfaces;
 using DataAccesLayer.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccesLayer.Repositories;
 
@@ -11,6 +12,22 @@ public sealed class SqlSportEventRepository : ISportEventRepository
     public SqlSportEventRepository(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public async Task<IReadOnlyList<SportEvent>> GetAllAsync()
+    {
+        return await _dbContext.SportEvents
+            .AsNoTracking()
+            .OrderByDescending(sportEvent => sportEvent.StartDate)
+            .ThenBy(sportEvent => sportEvent.EventName)
+            .ToListAsync();
+    }
+
+    public Task<SportEvent?> GetByIdAsync(int eventId)
+    {
+        return _dbContext.SportEvents
+            .AsNoTracking()
+            .SingleOrDefaultAsync(sportEvent => sportEvent.EventId == eventId);
     }
 
     public async Task<SportEvent> CreateAsync(SportEvent sportEvent)

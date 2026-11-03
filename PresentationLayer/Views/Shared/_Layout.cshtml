@@ -38,6 +38,16 @@
                                     </a>
                                 </li>
                             }
+                            @if (User.IsInRole("Organizer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                       asp-controller="SportEvent"
+                                       asp-action="Index">
+                                        Sportevenementen
+                                    </a>
+                                </li>
+                            }
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post">
                                     @Html.AntiForgeryToken()

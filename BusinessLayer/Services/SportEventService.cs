@@ -12,6 +12,21 @@ public sealed class SportEventService
         _sportEventRepository = sportEventRepository;
     }
 
+    public Task<IReadOnlyList<SportEvent>> GetAllAsync()
+    {
+        return _sportEventRepository.GetAllAsync();
+    }
+
+    public Task<SportEvent?> GetByIdAsync(int eventId)
+    {
+        if (eventId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(eventId));
+        }
+
+        return _sportEventRepository.GetByIdAsync(eventId);
+    }
+
     public Task<SportEvent> CreateAsync(
         string eventName,
         string description,

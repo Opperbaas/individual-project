@@ -15,6 +15,52 @@ public sealed class SportEventController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Organizer,Participant,Volunteer")]
+    public async Task<IActionResult> Index()
+    {
+        var sportEvents = await _sportEventService.GetAllAsync();
+        var model = sportEvents
+            .Select(sportEvent => new SportEventViewModel
+            {
+                EventId = sportEvent.EventId,
+                EventName = sportEvent.EventName,
+                Description = sportEvent.Description,
+                StartDate = sportEvent.StartDate,
+                EndDate = sportEvent.EndDate
+            })
+            .ToList();
+
+        return View("~/Views/SportEvent/Index.cshtml", model);
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Organizer")]
+    public async Task<IActionResult> Manage(int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest();
+        }
+
+        var sportEvent = await _sportEventService.GetByIdAsync(id);
+        if (sportEvent is null)
+        {
+            return NotFound();
+        }
+
+        var model = new SportEventViewModel
+        {
+            EventId = sportEvent.EventId,
+            EventName = sportEvent.EventName,
+            Description = sportEvent.Description,
+            StartDate = sportEvent.StartDate,
+            EndDate = sportEvent.EndDate
+        };
+
+        return View("~/Views/SportEvent/Manage.cshtml", model);
+    }
+
+    [HttpGet]
     [Authorize(Roles = "Organizer")]
     public IActionResult Create()
     {
@@ -39,10 +85,7 @@ public sealed class SportEventController : Controller
                 model.StartDate,
                 model.EndDate);
 
-            return RedirectToAction(
-                "Index",
-                "Planning",
-                new { eventId = sportEvent.EventId });
+            return RedirectToAction(nameof(Index));
         }
         catch (ArgumentException exception)
         {
