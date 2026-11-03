@@ -28,6 +28,42 @@ public sealed class SqlPlanningRepository : IPlanningRepository
             .ToListAsync();
     }
 
+    public async Task<IReadOnlyList<Activity>> GetActivitiesByEventIdAsync(int eventId)
+    {
+        return await _dbContext.Activities
+            .AsNoTracking()
+            .Where(activity => activity.EventId == eventId)
+            .OrderBy(activity => activity.ActivityName)
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<Location>> GetLocationsAsync()
+    {
+        return await _dbContext.Locations
+            .AsNoTracking()
+            .OrderBy(location => location.Name)
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<TimeSlot>> GetTimeSlotsByEventIdAsync(int eventId)
+    {
+        return await _dbContext.TimeSlots
+            .AsNoTracking()
+            .Where(timeSlot => timeSlot.EventId == eventId)
+            .OrderBy(timeSlot => timeSlot.SlotDate)
+            .ThenBy(timeSlot => timeSlot.StartTime)
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<User>> GetVolunteersAsync()
+    {
+        return await _dbContext.Users
+            .AsNoTracking()
+            .Where(user => user.Role.Name == "Volunteer")
+            .OrderBy(user => user.Name)
+            .ToListAsync();
+    }
+
     public async Task<Planning> CreateAsync(Planning planning)
     {
         ArgumentNullException.ThrowIfNull(planning);

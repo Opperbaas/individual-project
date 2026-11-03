@@ -36,6 +36,36 @@ public sealed class PlanningService
         return _planningRepository.GetByEventIdAsync(eventId);
     }
 
+    public Task<IReadOnlyList<Activity>> GetActivitiesByEventIdAsync(int eventId)
+    {
+        if (eventId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(eventId));
+        }
+
+        return _planningRepository.GetActivitiesByEventIdAsync(eventId);
+    }
+
+    public Task<IReadOnlyList<Location>> GetLocationsAsync()
+    {
+        return _planningRepository.GetLocationsAsync();
+    }
+
+    public Task<IReadOnlyList<TimeSlot>> GetTimeSlotsByEventIdAsync(int eventId)
+    {
+        if (eventId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(eventId));
+        }
+
+        return _planningRepository.GetTimeSlotsByEventIdAsync(eventId);
+    }
+
+    public Task<IReadOnlyList<User>> GetVolunteersAsync()
+    {
+        return _planningRepository.GetVolunteersAsync();
+    }
+
     public Task<Planning> CreateAsync(Planning planning)
     {
         ArgumentNullException.ThrowIfNull(planning);
