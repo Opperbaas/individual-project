@@ -1,0 +1,86 @@
+@model PresentationLayer.Models.SportEventViewModel
+
+@{
+    ViewData["Title"] = "Evenement beheren";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>@Model.EventName beheren</h1>
+        <p class="text-muted mb-0">
+            @Model.StartDate.ToString("dd-MM-yyyy") -
+            @Model.EndDate.ToString("dd-MM-yyyy")
+        </p>
+    </div>
+    <a class="btn btn-outline-secondary"
+       asp-controller="SportEvent"
+       asp-action="Index">
+        Terug naar evenementen
+    </a>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.Description))
+{
+    <p>@Model.Description</p>
+}
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Activiteiten</h2>
+                <p>Voeg activiteiten toe voor dit evenement.</p>
+                <a class="btn btn-primary"
+                   asp-controller="Activity"
+                   asp-action="Create"
+                   asp-route-eventId="@Model.EventId">
+                    Activiteit toevoegen
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Tijdsloten</h2>
+                <p>Voeg tijdsloten toe voor dit evenement.</p>
+                <a class="btn btn-primary"
+                   asp-controller="TimeSlot"
+                   asp-action="Create"
+                   asp-route-eventId="@Model.EventId">
+                    Tijdslot toevoegen
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Locaties</h2>
+                <p>Voeg locaties toe die in planningen gebruikt kunnen worden.</p>
+                <a class="btn btn-primary"
+                   asp-controller="Location"
+                   asp-action="Create">
+                    Locatie toevoegen
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Planningen</h2>
+                <p>Maak een planning met activiteiten, locaties en tijdsloten.</p>
+                <a class="btn btn-primary"
+                   asp-controller="Planning"
+                   asp-action="Index"
+                   asp-route-eventId="@Model.EventId">
+                    Planningen bekijken
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
