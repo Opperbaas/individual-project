@@ -51,6 +51,12 @@ public sealed class VolunteerAssignmentService
 
         foreach (var request in requestList)
         {
+            if (request.ActivityScheduleId <= 0)
+            {
+                throw new InvalidOperationException(
+                    "Het activiteitsschema bestaat niet.");
+            }
+
             var timeSlot = await _repository.GetTimeSlotAsync(request.TimeSlotId);
             if (timeSlot is null)
             {
@@ -81,7 +87,7 @@ public sealed class VolunteerAssignmentService
                 assignments.Add(new VolunteerAssignment
                 {
                     UserId = volunteerId,
-                    ActivityId = request.ActivityId
+                    ActivityScheduleId = request.ActivityScheduleId
                 });
             }
         }

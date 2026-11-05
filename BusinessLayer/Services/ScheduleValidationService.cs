@@ -4,7 +4,9 @@ namespace BusinessLayer.Services;
 
 public sealed class ScheduleValidationService
 {
-    public IReadOnlyList<string> Validate(Planning planning)
+    public IReadOnlyList<string> Validate(
+        Planning planning,
+        IEnumerable<Planning>? existingPlannings = null)
     {
         ArgumentNullException.ThrowIfNull(planning);
 
@@ -55,21 +57,56 @@ public sealed class ScheduleValidationService
                     continue;
                 }
 
-                if (current.LocationId == other.LocationId)
-                {
-                    errors.Add(
-                        $"Locatie {current.LocationId} is dubbel ingepland tijdens overlappende tijdsloten.");
-                }
+                AddConflictErrors(errors, current, other);
+            }
+        }
 
-                if (current.ActivityId == other.ActivityId)
+        foreach (var existingPlanning in existingPlannings ?? [])
+        {
+            if (existingPlanning.PlanningId == planning.PlanningId ||
+                existingPlanning.EventId != planning.EventId)
+            {
+                continue;
+            }
+
+            foreach (var current in schedules)
+            {
+                foreach (var existing in existingPlanning.ActivitySchedules)
                 {
-                    errors.Add(
-                        $"Activiteit {current.ActivityId} is dubbel ingepland tijdens overlappende tijdsloten.");
+                    if (current.TimeSlot is null || existing.TimeSlot is null)
+                    {
+                        continue;
+                    }
+
+                    if (!Overlaps(current.TimeSlot, existing.TimeSlot))
+                    {
+                        continue;
+                    }
+
+                    AddConflictErrors(errors, current, existing);
                 }
             }
         }
 
         return errors.Distinct().ToArray();
+    }
+
+    private static void AddConflictErrors(
+        ICollection<string> errors,
+        ActivitySchedule current,
+        ActivitySchedule other)
+    {
+        if (current.LocationId == other.LocationId)
+        {
+            errors.Add(
+                $"Locatie {current.LocationId} is dubbel ingepland tijdens overlappende tijdsloten.");
+        }
+
+        if (current.ActivityId == other.ActivityId)
+        {
+            errors.Add(
+                $"Activiteit {current.ActivityId} is dubbel ingepland tijdens overlappende tijdsloten.");
+        }
     }
 
     private static bool Overlaps(TimeSlot first, TimeSlot second)

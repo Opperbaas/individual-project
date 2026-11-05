@@ -11,4 +11,6 @@ public sealed class ActivitySchedule
     public Location Location { get; set; } = null!;
     public TimeSlot TimeSlot { get; set; } = null!;
     public Planning Planning { get; set; } = null!;
+    public ICollection<VolunteerAssignment> VolunteerAssignments { get; set; }
+        = new List<VolunteerAssignment>();
 }

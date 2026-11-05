@@ -98,14 +98,14 @@ else
                             }
                         </td>
                         <td>
-                            @if (schedule.Activity.VolunteerAssignments.Count == 0)
+                            @if (schedule.VolunteerAssignments.Count == 0)
                             {
                                 <span class="text-muted">Geen</span>
                             }
                             else
                             {
                                 <ul class="mb-0 ps-3">
-                                    @foreach (var assignment in schedule.Activity.VolunteerAssignments)
+                                    @foreach (var assignment in schedule.VolunteerAssignments)
                                     {
                                         <li>@assignment.User.Name</li>
                                     }

@@ -66,11 +66,12 @@ public sealed class PlanningService
         return _planningRepository.GetVolunteersAsync();
     }
 
-    public Task<Planning> CreateAsync(Planning planning)
+    public async Task<Planning> CreateAsync(Planning planning)
     {
         ArgumentNullException.ThrowIfNull(planning);
         ValidatePlanning(planning);
-        EnsureValidSchedule(planning);
+        var existingPlannings = await GetPlanningsForEventAsync(planning.EventId);
+        EnsureValidSchedule(planning, existingPlannings);
 
         planning.CreatedAt = DateTime.UtcNow;
         if (string.IsNullOrWhiteSpace(planning.Status))
@@ -78,14 +79,13 @@ public sealed class PlanningService
             planning.Status = "Draft";
         }
 
-        return _planningRepository.CreateAsync(planning);
+        return await _planningRepository.CreateAsync(planning);
     }
 
     public async Task UpdateAsync(Planning planning)
     {
         ArgumentNullException.ThrowIfNull(planning);
         ValidatePlanning(planning);
-        EnsureValidSchedule(planning);
 
         var existingPlanning = await _planningRepository.GetByIdAsync(planning.PlanningId);
         if (existingPlanning is null)
@@ -94,19 +94,25 @@ public sealed class PlanningService
                 $"Planning met ID {planning.PlanningId} bestaat niet.");
         }
 
+        var existingPlannings = await GetPlanningsForEventAsync(planning.EventId);
+        EnsureValidSchedule(planning, existingPlannings);
         await _planningRepository.UpdateAsync(planning);
     }
 
     public async Task<IReadOnlyList<string>> ValidateAsync(int planningId)
     {
         var planning = await GetExistingPlanningAsync(planningId);
-        return _scheduleValidationService.Validate(planning);
+        var existingPlannings = await GetPlanningsForEventAsync(planning.EventId);
+        return _scheduleValidationService.Validate(planning, existingPlannings);
     }
 
     public async Task FinalizeAsync(int planningId)
     {
         var planning = await GetExistingPlanningAsync(planningId);
-        var validationErrors = _scheduleValidationService.Validate(planning);
+        var existingPlannings = await GetPlanningsForEventAsync(planning.EventId);
+        var validationErrors = _scheduleValidationService.Validate(
+            planning,
+            existingPlannings);
 
         if (validationErrors.Count > 0)
         {
@@ -135,15 +141,24 @@ public sealed class PlanningService
         return planning;
     }
 
-    private void EnsureValidSchedule(Planning planning)
+    private void EnsureValidSchedule(
+        Planning planning,
+        IEnumerable<Planning> existingPlannings)
     {
-        var validationErrors = _scheduleValidationService.Validate(planning);
+        var validationErrors = _scheduleValidationService.Validate(
+            planning,
+            existingPlannings);
         if (validationErrors.Count > 0)
         {
             throw new ArgumentException(
                 $"De planning bevat conflicten: {string.Join(" ", validationErrors)}",
                 nameof(planning));
         }
+    }
+
+    private Task<IReadOnlyList<Planning>> GetPlanningsForEventAsync(int eventId)
+    {
+        return _planningRepository.GetByEventIdAsync(eventId);
     }
 
     private static void ValidatePlanning(Planning planning)

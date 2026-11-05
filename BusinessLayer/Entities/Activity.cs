@@ -12,5 +12,4 @@ public sealed class Activity
     public SportEvent Event { get; set; } = null!;
     public ICollection<ActivitySchedule> ActivitySchedules { get; set; } = new List<ActivitySchedule>();
     public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
-    public ICollection<VolunteerAssignment> VolunteerAssignments { get; set; } = new List<VolunteerAssignment>();
 }

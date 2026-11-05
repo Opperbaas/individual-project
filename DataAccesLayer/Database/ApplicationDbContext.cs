@@ -139,9 +139,9 @@ public class ApplicationDbContext : DbContext
                 .WithMany(user => user.VolunteerAssignments)
                 .HasForeignKey(assignment => assignment.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne(assignment => assignment.Activity)
-                .WithMany(activity => activity.VolunteerAssignments)
-                .HasForeignKey(assignment => assignment.ActivityId)
+            entity.HasOne(assignment => assignment.ActivitySchedule)
+                .WithMany(schedule => schedule.VolunteerAssignments)
+                .HasForeignKey(assignment => assignment.ActivityScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 

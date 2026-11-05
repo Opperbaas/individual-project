@@ -123,17 +123,19 @@ public sealed class PlanningController : Controller
                 });
             }
 
-            var assignmentRequests = model.Schedules.Select(schedule =>
-                new VolunteerAssignmentRequest
-                {
-                    ActivityId = schedule.ActivityId,
-                    TimeSlotId = schedule.TimeSlotId,
-                    VolunteerIds = schedule.VolunteerIds
-                }).ToList();
-
-            await _volunteerAssignmentService.ValidateAsync(assignmentRequests);
             planning = await _planningService.CreateAsync(planning);
 
+            var assignmentRequests = planning.ActivitySchedules
+                .Zip(model.Schedules, (activitySchedule, schedule) =>
+                    new VolunteerAssignmentRequest
+                    {
+                        ActivityScheduleId = activitySchedule.ActivityScheduleId,
+                        TimeSlotId = schedule.TimeSlotId,
+                        VolunteerIds = schedule.VolunteerIds
+                    })
+                .ToList();
+
+            await _volunteerAssignmentService.ValidateAsync(assignmentRequests);
             await _volunteerAssignmentService.AssignAsync(assignmentRequests);
 
             return RedirectToAction(nameof(Details), new { id = planning.PlanningId });
