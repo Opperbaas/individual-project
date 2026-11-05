@@ -1,0 +1,28 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio and VS Code user files
+.vs/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
+*.user
+*.suo
+
+# Test and tool output
+TestResults/
+*.trx
+*.coverage
+*.cache
+
+# Compiled and debug files
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# ASP.NET Core local settings
+appsettings.Development.json
+secrets.json
