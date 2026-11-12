@@ -2,6 +2,11 @@ html {
   font-size: 14px;
 }
 
+html,
+body {
+  min-height: 100%;
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;
@@ -18,7 +23,228 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  margin: 0;
+  background: #f4f7fb;
+  color: #17233c;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+}
+
+.app-navbar {
+  background: linear-gradient(110deg, #102447 0%, #153b68 58%, #087f9d 100%);
+  border-bottom-color: rgba(255, 255, 255, .12) !important;
+}
+
+.navbar-brand {
+  align-items: center;
+  display: inline-flex;
+  font-weight: 700;
+  gap: .65rem;
+  letter-spacing: -.02em;
+}
+
+.brand-mark {
+  align-items: center;
+  background: #4de1c1;
+  border-radius: .7rem;
+  color: #102447;
+  display: inline-flex;
+  font-size: .78rem;
+  height: 2rem;
+  justify-content: center;
+  letter-spacing: 0;
+  width: 2rem;
+}
+
+.app-navbar .nav-link {
+  border-radius: .55rem;
+  color: rgba(255, 255, 255, .82);
+  margin: .15rem;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+.app-navbar .nav-link:hover,
+.app-navbar .nav-link:focus {
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+}
+
+.nav-welcome {
+  color: #9deee0 !important;
+  font-weight: 600;
+}
+
+.app-footer {
+  background: #102447;
+  color: rgba(255, 255, 255, .7);
+  margin-top: 3rem;
+  padding: 1.15rem 0;
+}
+
+.app-footer a {
+  color: #8debd9;
+}
+
+.privacy-page {
+  padding: 1rem 0 2rem;
+}
+
+.privacy-hero {
+  align-items: center;
+  background: linear-gradient(120deg, #102447, #176b8d);
+  border-radius: 1.5rem;
+  color: #fff;
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  padding: clamp(2rem, 5vw, 4rem);
+  position: relative;
+}
+
+.privacy-hero::after {
+  background: rgba(77, 225, 193, .18);
+  border-radius: 50%;
+  content: "";
+  height: 18rem;
+  position: absolute;
+  right: -5rem;
+  top: -8rem;
+  width: 18rem;
+}
+
+.privacy-hero h1 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  letter-spacing: -.045em;
+  margin: .5rem 0 1rem;
+  max-width: 38rem;
+}
+
+.privacy-hero .lead {
+  color: rgba(255, 255, 255, .78);
+  margin-bottom: 0;
+  max-width: 42rem;
+}
+
+.eyebrow {
+  color: #4de1c1;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.privacy-hero-badge {
+  align-items: center;
+  background: rgba(255, 255, 255, .12);
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 1rem;
+  display: flex;
+  flex-shrink: 0;
+  gap: .8rem;
+  padding: 1rem 1.1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.privacy-hero-icon {
+  align-items: center;
+  background: #4de1c1;
+  border-radius: 50%;
+  color: #102447;
+  display: inline-flex;
+  font-size: 1.4rem;
+  font-weight: 800;
+  height: 2.5rem;
+  justify-content: center;
+  width: 2.5rem;
+}
+
+.privacy-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.privacy-card,
+.privacy-note {
+  background: #fff;
+  border: 1px solid #e4eaf3;
+  border-radius: 1rem;
+  box-shadow: 0 .7rem 2rem rgba(16, 36, 71, .06);
+}
+
+.privacy-card {
+  padding: 1.6rem;
+}
+
+.privacy-card-accent {
+  border-top: 4px solid #4de1c1;
+}
+
+.privacy-card h2,
+.privacy-note h2 {
+  color: #102447;
+  font-size: 1.2rem;
+  margin: 1rem 0 .65rem;
+}
+
+.privacy-card p,
+.privacy-note p {
+  color: #5d6b82;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.card-icon {
+  align-items: center;
+  background: #dffaf3;
+  border-radius: .65rem;
+  color: #087f72;
+  display: inline-flex;
+  font-size: .75rem;
+  font-weight: 800;
+  height: 2.2rem;
+  justify-content: center;
+  width: 2.2rem;
+}
+
+.card-icon-blue {
+  background: #e2f1ff;
+  color: #1762a0;
+}
+
+.card-icon-purple {
+  background: #f0e9ff;
+  color: #6942a5;
+}
+
+.card-icon-green {
+  background: #e7f7e9;
+  color: #287c3d;
+}
+
+.privacy-note {
+  align-items: center;
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding: 1.6rem;
+}
+
+.privacy-note h2 {
+  margin-top: .35rem;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -28,4 +254,16 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+@media (max-width: 767.98px) {
+  .privacy-hero,
+  .privacy-note {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .privacy-grid {
+    grid-template-columns: 1fr;
+  }
 }

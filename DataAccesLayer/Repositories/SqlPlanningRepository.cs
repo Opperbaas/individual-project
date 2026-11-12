@@ -69,6 +69,24 @@ public sealed class SqlPlanningRepository : IPlanningRepository
     {
         ArgumentNullException.ThrowIfNull(planning);
 
+        foreach (var schedule in planning.ActivitySchedules)
+        {
+            if (schedule.Activity is not null)
+            {
+                _dbContext.Entry(schedule.Activity).State = EntityState.Unchanged;
+            }
+
+            if (schedule.Location is not null)
+            {
+                _dbContext.Entry(schedule.Location).State = EntityState.Unchanged;
+            }
+
+            if (schedule.TimeSlot is not null)
+            {
+                _dbContext.Entry(schedule.TimeSlot).State = EntityState.Unchanged;
+            }
+        }
+
         _dbContext.Plannings.Add(planning);
         await _dbContext.SaveChangesAsync();
 

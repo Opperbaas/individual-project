@@ -121,7 +121,10 @@ public sealed class PlanningController : Controller
                 {
                     ActivityId = activity.ActivityId,
                     LocationId = location.LocationId,
-                    TimeSlotId = timeSlot.TimeSlotId
+                    TimeSlotId = timeSlot.TimeSlotId,
+                    Activity = activity,
+                    Location = location,
+                    TimeSlot = timeSlot
                 });
             }
 

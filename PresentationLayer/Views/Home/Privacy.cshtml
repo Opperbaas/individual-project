@@ -1,6 +1,77 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Privacy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="privacy-page">
+    <section class="privacy-hero">
+        <div>
+            <span class="eyebrow">Jouw gegevens, jouw vertrouwen</span>
+            <h1>Privacy bij Smart Sports Event Planner</h1>
+            <p class="lead">
+                We gebruiken jouw gegevens alleen om sportevenementen, planningen
+                en vrijwilligersactiviteiten goed te laten verlopen.
+            </p>
+        </div>
+        <div class="privacy-hero-badge">
+            <span class="privacy-hero-icon">✓</span>
+            <strong>Transparant<br />en zorgvuldig</strong>
+        </div>
+    </section>
+
+    <div class="privacy-grid">
+        <section class="privacy-card privacy-card-accent">
+            <span class="card-icon">01</span>
+            <h2>Welke gegevens gebruiken we?</h2>
+            <p>
+                Bij een account bewaren we je naam, e-mailadres, wachtwoord en rol.
+                Voor planning en beschikbaarheid kunnen ook evenement-, tijdslot-
+                en beschikbaarheidsgegevens worden opgeslagen.
+            </p>
+        </section>
+
+        <section class="privacy-card">
+            <span class="card-icon card-icon-blue">02</span>
+            <h2>Waarvoor gebruiken we ze?</h2>
+            <p>
+                We gebruiken deze gegevens om je aan te melden, je de juiste
+                functies te tonen en activiteiten, planningen en vrijwilligers
+                met elkaar te verbinden.
+            </p>
+        </section>
+
+        <section class="privacy-card">
+            <span class="card-icon card-icon-purple">03</span>
+            <h2>Hoe beschermen we ze?</h2>
+            <p>
+                Wachtwoorden worden niet als gewone tekst opgeslagen. Toegang tot
+                onderdelen van de applicatie is beperkt op basis van je rol.
+                We bewaren niet meer gegevens dan nodig is voor de werking van de app.
+            </p>
+        </section>
+
+        <section class="privacy-card">
+            <span class="card-icon card-icon-green">04</span>
+            <h2>Jouw rechten</h2>
+            <p>
+                Je mag vragen welke gegevens we van je bewaren, onjuiste gegevens
+                laten aanpassen of vragen om verwijdering wanneer dat mogelijk is.
+                Neem hiervoor contact op met de beheerder van de applicatie.
+            </p>
+        </section>
+    </div>
+
+    <section class="privacy-note">
+        <div>
+            <span class="eyebrow">Goed om te weten</span>
+            <h2>Geen verkoop van persoonsgegevens</h2>
+            <p>
+                We verkopen of verhuren je persoonsgegevens niet aan derden.
+                Deze pagina is algemene informatie over deze applicatie en kan
+                worden bijgewerkt wanneer de werking verandert.
+            </p>
+        </div>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">
+            Terug naar home
+        </a>
+    </section>
+</div>

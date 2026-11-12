@@ -9,11 +9,14 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PresentationLayer.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body class="app-shell">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light light-blue-navbar border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark app-navbar border-bottom box-shadow mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand ms-auto" asp-area="" asp-controller="Home" asp-action="Index">Smart Sports Event Planner</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark">SS</span>
+                    <span>Smart Sports Event Planner</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -21,64 +24,61 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="SportEvent"
+                               asp-action="Index">
+                                Sportevenementen
+                            </a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <span class="nav-link text-dark">Welkom, @User.Identity.Name</span>
+                                <span class="nav-link nav-welcome">Welkom, @User.Identity.Name</span>
                             </li>
-                            @if (User.IsInRole("Volunteer"))
+                            @if (User.IsInRole(RoleNames.Volunteer))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark"
+                                    <a class="nav-link"
                                        asp-controller="Availability"
                                        asp-action="Create">
                                         Beschikbaarheid
                                     </a>
                                 </li>
                             }
-                            @if (User.IsInRole("Organizer"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark"
-                                       asp-controller="SportEvent"
-                                       asp-action="Index">
-                                        Sportevenementen
-                                    </a>
-                                </li>
-                            }
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="nav-link text-dark border-0 bg-transparent">Uitloggen</button>
+                                    <button type="submit" class="nav-link border-0 bg-transparent">Uitloggen</button>
                                 </form>
                             </li>
                         }
                         else
                         {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Account aanmaken</a>
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Account aanmaken</a>
                         </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container app-content">
+        <main role="main" class="pb-4">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="app-footer">
         <div class="container">
             &copy; 2026 - PresentationLayer - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>

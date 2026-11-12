@@ -12,7 +12,7 @@
     <span class="badge text-bg-secondary fs-6">@Model.Status</span>
 </div>
 
-@if (User.IsInRole("Organizer"))
+@if (User.IsInRole(RoleNames.Organizer))
 {
     <a class="btn btn-outline-primary mb-4"
        asp-controller="Planning"
@@ -79,7 +79,7 @@ else
                         <td>
                             @schedule.Activity.Registrations.Count /
                             @schedule.Activity.MaxParticipants
-                            @if (User.IsInRole("Participant"))
+                            @if (User.IsInRole(RoleNames.Participant))
                             {
                                 <form asp-controller="Registration"
                                       asp-action="Create"

@@ -17,10 +17,6 @@ public sealed class SportEventController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles =
-        RoleNames.Organizer + "," +
-        RoleNames.Participant + "," +
-        RoleNames.Volunteer)]
     public async Task<IActionResult> Index()
     {
         var sportEvents = await _sportEventService.GetAllAsync();
