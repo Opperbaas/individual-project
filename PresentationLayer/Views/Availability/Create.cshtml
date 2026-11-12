@@ -27,6 +27,13 @@
         </div>
     </div>
 
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+        <div class="alert alert-success availability-alert" role="status">
+            <strong>Opgeslagen.</strong> @successMessage
+        </div>
+    }
+
     <form asp-controller="Availability" asp-action="SaveCalendar" method="post">
     @Html.AntiForgeryToken()
     <input asp-for="WeekStart" type="hidden" />
@@ -69,7 +76,12 @@
     </div>
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-4">
-        <p class="text-muted mb-0"><strong id="selected-slot-count">@Model.SelectedSlots.Count</strong> blokken geselecteerd</p>
+        <p class="text-muted mb-0">
+            <strong id="selected-slot-count">@Model.SelectedSlots.Count</strong> blokken geselecteerd
+            <span class="availability-save-status" id="availability-save-status">
+                Opgeslagen beschikbaarheid
+            </span>
+        </p>
         <div>
             <button type="button" class="btn btn-outline-secondary me-2" id="clear-availability">
                 Selectie wissen
@@ -88,11 +100,26 @@
         (() => {
             const calendar = document.querySelector(".availability-calendar");
             const counter = document.querySelector("#selected-slot-count");
+            const status = document.querySelector("#availability-save-status");
             const clearButton = document.querySelector("#clear-availability");
+            const initialSelection = [...calendar.querySelectorAll("input[type=checkbox]:checked")]
+                .map(input => input.value)
+                .sort()
+                .join(",");
 
             function updateSelection() {
                 const checked = calendar.querySelectorAll("input[type=checkbox]:checked");
+                const currentSelection = [...checked]
+                    .map(input => input.value)
+                    .sort()
+                    .join(",");
                 counter.textContent = checked.length;
+                status.textContent = currentSelection === initialSelection
+                    ? "Opgeslagen beschikbaarheid"
+                    : "Niet-opgeslagen wijzigingen";
+                status.classList.toggle(
+                    "is-dirty",
+                    currentSelection !== initialSelection);
                 calendar.querySelectorAll(".availability-slot").forEach(slot => {
                     slot.classList.toggle("is-selected",
                         slot.querySelector("input").checked);

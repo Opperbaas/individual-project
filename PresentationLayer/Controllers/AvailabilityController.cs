@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Globalization;
+using BusinessLayer.Entities;
 using BusinessLayer.Enums;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
@@ -20,11 +21,23 @@ public sealed class AvailabilityController : Controller
 
     [HttpGet]
     [Authorize(Roles = RoleNames.Volunteer)]
-    public IActionResult Create(DateOnly? weekStart)
+    public async Task<IActionResult> Create(DateOnly? weekStart)
     {
+        if (!int.TryParse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier),
+                out var userId))
+        {
+            return Forbid();
+        }
+
+        var savedAvailability = await _availabilityService
+            .GetByUserIdAsync(userId);
+
         return View(
             "~/Views/Availability/Create.cshtml",
-            CreateCalendarModel(weekStart ?? DateOnly.FromDateTime(DateTime.Today)));
+            CreateCalendarModel(
+                weekStart ?? DateOnly.FromDateTime(DateTime.Today),
+                ToSlotKeys(savedAvailability)));
     }
 
     [HttpPost]
@@ -40,12 +53,6 @@ public sealed class AvailabilityController : Controller
         }
 
         var ranges = ParseRanges(model.SelectedSlots);
-        if (ranges.Count == 0)
-        {
-            ModelState.AddModelError(
-                nameof(model.SelectedSlots),
-                "Selecteer minstens één beschikbaar tijdsblok.");
-        }
 
         if (!ModelState.IsValid)
         {
@@ -55,14 +62,14 @@ public sealed class AvailabilityController : Controller
 
         try
         {
-            foreach (var range in ranges)
-            {
-                await _availabilityService.CreateAsync(
-                    userId,
-                    range.Date,
-                    range.StartTime,
-                    range.EndTime);
-            }
+            await _availabilityService.ReplaceForUserAsync(
+                userId,
+                ranges.Select(range => new Availability
+                {
+                    AvailableDate = range.Date,
+                    StartTime = range.StartTime,
+                    EndTime = range.EndTime
+                }));
 
             TempData["SuccessMessage"] = "Je beschikbaarheid is opgeslagen.";
             return RedirectToAction(nameof(Create));
@@ -101,6 +108,20 @@ public sealed class AvailabilityController : Controller
                 Days = days,
                 SelectedSlots = selectedSlots?.ToList() ?? []
             };
+        }
+
+        private static IEnumerable<string> ToSlotKeys(
+            IEnumerable<Availability> availability)
+        {
+            foreach (var range in availability)
+            {
+                for (var time = range.StartTime;
+                     time < range.EndTime;
+                     time = time.AddMinutes(30))
+                {
+                    yield return $"{range.AvailableDate:yyyy-MM-dd}|{time:HH\\:mm}";
+                }
+            }
         }
 
         private static DateOnly GetMonday(DateOnly date)
