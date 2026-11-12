@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using BusinessLayer.Enums;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +17,14 @@ public sealed class AvailabilityController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Volunteer")]
+    [Authorize(Roles = RoleNames.Volunteer)]
     public IActionResult Create()
     {
         return View("~/Views/Availability/Create.cshtml");
     }
 
     [HttpPost]
-    [Authorize(Roles = "Volunteer")]
+    [Authorize(Roles = RoleNames.Volunteer)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateAvailabilityViewModel model)
     {

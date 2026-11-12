@@ -1,3 +1,4 @@
+using BusinessLayer.Enums;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,10 @@ public sealed class SportEventController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Organizer,Participant,Volunteer")]
+    [Authorize(Roles =
+        RoleNames.Organizer + "," +
+        RoleNames.Participant + "," +
+        RoleNames.Volunteer)]
     public async Task<IActionResult> Index()
     {
         var sportEvents = await _sportEventService.GetAllAsync();
@@ -34,7 +38,7 @@ public sealed class SportEventController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     public async Task<IActionResult> Manage(int id)
     {
         if (id <= 0)
@@ -61,14 +65,14 @@ public sealed class SportEventController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     public IActionResult Create()
     {
         return View("~/Views/SportEvent/Create.cshtml");
     }
 
     [HttpPost]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateSportEventViewModel model)
     {

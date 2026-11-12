@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using BusinessLayer.DTOs;
 using BusinessLayer.Entities;
+using BusinessLayer.Enums;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,7 +51,7 @@ public sealed class PlanningController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     public async Task<IActionResult> Create(int eventId)
     {
         if (eventId <= 0)
@@ -69,7 +70,7 @@ public sealed class PlanningController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreatePlanningViewModel model)
     {
@@ -193,7 +194,7 @@ public sealed class PlanningController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     public async Task<IActionResult> Edit(int id)
     {
         if (id <= 0)
@@ -216,7 +217,7 @@ public sealed class PlanningController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(EditPlanningViewModel model)
     {

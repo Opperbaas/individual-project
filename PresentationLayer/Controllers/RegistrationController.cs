@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using BusinessLayer.Enums;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ public sealed class RegistrationController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Participant")]
+    [Authorize(Roles = RoleNames.Participant)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(int activityId, int planningId)
     {

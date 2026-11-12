@@ -40,7 +40,7 @@ public sealed class SqlAccountRepository : IAccountRepository
     public async Task CreateAsync(string name, string email, string passwordHash)
     {
         var roleId = await _dbContext.Roles
-            .Where(role => role.Name == RoleType.User.ToString())
+            .Where(role => role.Name == RoleNames.User)
             .Select(role => (int?)role.RoleId)
             .SingleOrDefaultAsync();
 

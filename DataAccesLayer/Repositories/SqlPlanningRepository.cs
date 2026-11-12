@@ -1,4 +1,5 @@
 using BusinessLayer.Entities;
+using BusinessLayer.Enums;
 using BusinessLayer.Interfaces;
 using DataAccesLayer.Database;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +60,7 @@ public sealed class SqlPlanningRepository : IPlanningRepository
     {
         return await _dbContext.Users
             .AsNoTracking()
-            .Where(user => user.Role.Name == "Volunteer")
+            .Where(user => user.Role.Name == RoleNames.Volunteer)
             .OrderBy(user => user.Name)
             .ToListAsync();
     }

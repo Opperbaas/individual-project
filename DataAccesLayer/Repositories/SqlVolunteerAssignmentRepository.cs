@@ -24,7 +24,7 @@ public sealed class SqlVolunteerAssignmentRepository
         return await _dbContext.Users
             .AsNoTracking()
             .Where(user => ids.Contains(user.UserId) &&
-                           user.Role.Name == RoleType.Volunteer.ToString())
+                           user.Role.Name == RoleNames.Volunteer)
             .ToListAsync();
     }
 

@@ -1,3 +1,4 @@
+using BusinessLayer.Enums;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ public sealed class TimeSlotController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     public IActionResult Create(int eventId)
     {
         if (eventId <= 0)
@@ -28,7 +29,7 @@ public sealed class TimeSlotController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateTimeSlotViewModel model)
     {

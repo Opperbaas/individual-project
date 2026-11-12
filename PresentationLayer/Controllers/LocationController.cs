@@ -1,3 +1,4 @@
+using BusinessLayer.Enums;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,14 +16,14 @@ public sealed class LocationController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     public IActionResult Create()
     {
         return View("~/Views/Location/Create.cshtml");
     }
 
     [HttpPost]
-    [Authorize(Roles = "Organizer")]
+    [Authorize(Roles = RoleNames.Organizer)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateLocationViewModel model)
     {
