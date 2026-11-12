@@ -1,41 +1,111 @@
-@model PresentationLayer.Models.CreateAvailabilityViewModel
+@model PresentationLayer.Models.AvailabilityCalendarViewModel
 
 @{
-    ViewData["Title"] = "Beschikbaarheid invoeren";
+    ViewData["Title"] = "Beschikbaarheid";
+    var previousWeek = Model.WeekStart.AddDays(-7).ToString("yyyy-MM-dd");
+    var nextWeek = Model.WeekStart.AddDays(7).ToString("yyyy-MM-dd");
 }
 
-<h1>Beschikbaarheid invoeren</h1>
+<div class="availability-page">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <span class="eyebrow">Vrijwilligersplanning</span>
+            <h1 class="mb-1">Mijn beschikbaarheid</h1>
+            <p class="text-muted mb-0">Klik op blokken van 30 minuten om je beschikbare tijden te selecteren.</p>
+        </div>
+        <div class="availability-week-nav">
+            <a class="btn btn-outline-secondary"
+               asp-action="Create"
+               asp-route-weekStart="@previousWeek">‹</a>
+            <span class="availability-week-label">
+                @Model.WeekStart.ToString("dd MMM") -
+                @Model.WeekStart.AddDays(6).ToString("dd MMM yyyy")
+            </span>
+            <a class="btn btn-outline-secondary"
+               asp-action="Create"
+               asp-route-weekStart="@nextWeek">›</a>
+        </div>
+    </div>
 
-<p>Geef aan wanneer je beschikbaar bent als vrijwilliger.</p>
-
-<form asp-controller="Availability" asp-action="Create" method="post">
+    <form asp-controller="Availability" asp-action="SaveCalendar" method="post">
     @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="WeekStart" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-    <div class="mb-3">
-        <label asp-for="AvailableDate" class="form-label"></label>
-        <input asp-for="AvailableDate" type="date" class="form-control" />
-        <span asp-validation-for="AvailableDate" class="text-danger"></span>
+    <div class="availability-calendar">
+        <div class="availability-calendar-head">
+            <div class="availability-time-label">Tijd</div>
+            @foreach (var day in Model.Days)
+            {
+                <div class="availability-day-header @(day.IsToday ? "is-today" : "")">
+                    <span>@day.DayName</span>
+                    <strong>@day.Date.Day</strong>
+                </div>
+            }
+        </div>
+
+        @for (var hour = 7; hour < 23; hour++)
+        {
+            @for (var halfHour = 0; halfHour < 2; halfHour++)
+            {
+                var time = new TimeOnly(hour, halfHour * 30);
+                <div class="availability-calendar-row">
+                    <div class="availability-time-label">@time.ToString("HH:mm")</div>
+                    @foreach (var day in Model.Days)
+                    {
+                        var slotKey = $"{day.Date:yyyy-MM-dd}|{time:HH\\:mm}";
+                        var isSelected = Model.SelectedSlots.Contains(slotKey);
+                        <label class="availability-slot @(isSelected ? "is-selected" : "")">
+                            <input type="checkbox"
+                                   name="SelectedSlots"
+                                   value="@slotKey"
+                                   @(isSelected ? "checked" : null) />
+                            <span></span>
+                        </label>
+                    }
+                </div>
+            }
+        }
     </div>
 
-    <div class="mb-3">
-        <label asp-for="StartTime" class="form-label"></label>
-        <input asp-for="StartTime" type="time" class="form-control" />
-        <span asp-validation-for="StartTime" class="text-danger"></span>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-4">
+        <p class="text-muted mb-0"><strong id="selected-slot-count">@Model.SelectedSlots.Count</strong> blokken geselecteerd</p>
+        <div>
+            <button type="button" class="btn btn-outline-secondary me-2" id="clear-availability">
+                Selectie wissen
+            </button>
+            <button type="submit" class="btn btn-primary">
+                Beschikbaarheid opslaan
+            </button>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="EndTime" class="form-label"></label>
-        <input asp-for="EndTime" type="time" class="form-control" />
-        <span asp-validation-for="EndTime" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Beschikbaarheid opslaan</button>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
-        Annuleren
-    </a>
 </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const calendar = document.querySelector(".availability-calendar");
+            const counter = document.querySelector("#selected-slot-count");
+            const clearButton = document.querySelector("#clear-availability");
+
+            function updateSelection() {
+                const checked = calendar.querySelectorAll("input[type=checkbox]:checked");
+                counter.textContent = checked.length;
+                calendar.querySelectorAll(".availability-slot").forEach(slot => {
+                    slot.classList.toggle("is-selected",
+                        slot.querySelector("input").checked);
+                });
+            }
+
+            calendar.addEventListener("change", updateSelection);
+            clearButton.addEventListener("click", () => {
+                calendar.querySelectorAll("input[type=checkbox]").forEach(input => {
+                    input.checked = false;
+                });
+                updateSelection();
+            });
+        })();
+    </script>
 }

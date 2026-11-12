@@ -1,0 +1,89 @@
+@model IReadOnlyList<BusinessLayer.Entities.Planning>
+
+@{
+    ViewData["Title"] = "Mijn vrijwilligersplanning";
+}
+
+<div class="volunteer-page">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <span class="eyebrow">Vrijwilligersportaal</span>
+            <h1 class="mb-1">Mijn planning</h1>
+            <p class="text-muted mb-0">
+                Hier zie je de activiteiten waarvoor je bent ingepland.
+            </p>
+        </div>
+        <a class="btn btn-primary"
+           asp-controller="Availability"
+           asp-action="Create">
+            Beschikbaarheid aanpassen
+        </a>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="volunteer-empty">
+            <div class="volunteer-empty-icon">✓</div>
+            <h2>Nog geen planning</h2>
+            <p>
+                Je bent op dit moment nog niet ingepland voor een activiteit.
+                Houd deze pagina in de gaten voor nieuwe toewijzingen.
+            </p>
+            <a class="btn btn-outline-primary"
+               asp-controller="Availability"
+               asp-action="Create">
+                Mijn beschikbaarheid invullen
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="volunteer-planning-list">
+            @foreach (var planning in Model)
+            {
+                <section class="volunteer-planning-card">
+                    <div class="volunteer-planning-heading">
+                        <div>
+                            <span class="text-muted small">@planning.Event.EventName</span>
+                            <h2>@planning.Name</h2>
+                        </div>
+                        <span class="badge text-bg-info">@planning.Status</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Activiteit</th>
+                                    <th>Locatie</th>
+                                    <th>Datum</th>
+                                    <th>Tijd</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var schedule in planning.ActivitySchedules)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@schedule.Activity.ActivityName</strong>
+                                            <small class="d-block text-muted">
+                                                @schedule.Activity.ActivityType
+                                            </small>
+                                        </td>
+                                        <td>@schedule.Location.Name</td>
+                                        <td>@schedule.TimeSlot.SlotDate.ToString("dd-MM-yyyy")</td>
+                                        <td>
+                                            @schedule.TimeSlot.StartTime.ToString("HH:mm")
+                                            -
+                                            @schedule.TimeSlot.EndTime.ToString("HH:mm")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+        </div>
+    }
+</div>

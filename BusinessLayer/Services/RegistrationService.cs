@@ -50,7 +50,7 @@ public sealed class RegistrationService : IRegistrationService
             UserId = userId,
             ActivityId = activityId,
             RegisteredAt = DateTime.UtcNow,
-            Status = "Confirmed"
+            Status = "Registered"
         });
     }
 }

@@ -14,6 +14,17 @@ public sealed class VolunteerAssignmentService : IVolunteerAssignmentService
         _repository = repository;
     }
 
+    public Task<IReadOnlyList<Planning>> GetPlanningsByVolunteerIdAsync(
+        int userId)
+    {
+        if (userId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(userId));
+        }
+
+        return _repository.GetPlanningsByVolunteerIdAsync(userId);
+    }
+
     public async Task AssignAsync(
         IEnumerable<VolunteerAssignmentRequest> requests)
     {

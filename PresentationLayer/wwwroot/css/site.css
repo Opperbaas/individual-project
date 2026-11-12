@@ -247,6 +247,219 @@ body {
   margin-top: .35rem;
 }
 
+.availability-page {
+  padding: 1rem 0 2rem;
+}
+
+.availability-week-nav {
+  align-items: center;
+  display: flex;
+  gap: .75rem;
+}
+
+.availability-week-label {
+  color: #17233c;
+  font-weight: 700;
+  min-width: 10rem;
+  text-align: center;
+}
+
+.availability-calendar {
+  background: #fff;
+  border: 1px solid #e4eaf3;
+  border-radius: 1rem;
+  box-shadow: 0 .7rem 2rem rgba(16, 36, 71, .06);
+  min-width: 48rem;
+  overflow: hidden;
+}
+
+.availability-calendar-head,
+.availability-calendar-row {
+  display: grid;
+  grid-template-columns: 4.5rem repeat(7, minmax(5rem, 1fr));
+}
+
+.availability-calendar-head {
+  background: #102447;
+  color: #fff;
+}
+
+.availability-time-label {
+  align-items: center;
+  color: #7a879b;
+  display: flex;
+  font-size: .75rem;
+  justify-content: center;
+}
+
+.availability-calendar-head .availability-time-label {
+  color: rgba(255, 255, 255, .6);
+  font-weight: 700;
+}
+
+.availability-day-header {
+  align-items: center;
+  border-left: 1px solid rgba(255, 255, 255, .12);
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  padding: .8rem .35rem;
+  text-transform: capitalize;
+}
+
+.availability-day-header span {
+  color: rgba(255, 255, 255, .68);
+  font-size: .75rem;
+}
+
+.availability-day-header strong {
+  font-size: 1.15rem;
+}
+
+.availability-day-header.is-today strong {
+  background: #4de1c1;
+  border-radius: 50%;
+  color: #102447;
+  display: grid;
+  height: 2rem;
+  place-items: center;
+  width: 2rem;
+}
+
+.availability-calendar-row {
+  min-height: 2.2rem;
+}
+
+.availability-calendar-row:nth-child(odd) {
+  background: #fbfcfe;
+}
+
+.availability-calendar-row .availability-time-label {
+  border-top: 1px solid #eef2f7;
+}
+
+.availability-slot {
+  border-left: 1px solid #eef2f7;
+  border-top: 1px solid #eef2f7;
+  cursor: pointer;
+  display: block;
+  margin: 0;
+  padding: .2rem;
+  transition: background-color .15s ease;
+}
+
+.availability-slot:hover {
+  background: #e7f8f4;
+}
+
+.availability-slot input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.availability-slot span {
+  border-radius: .35rem;
+  display: block;
+  height: 100%;
+  min-height: 1.7rem;
+}
+
+.availability-slot.is-selected {
+  background: #d7f8ef;
+}
+
+.availability-slot.is-selected span {
+  background: #4de1c1;
+}
+
+.volunteer-page {
+  padding: 1rem 0 2rem;
+}
+
+.volunteer-empty,
+.volunteer-planning-card {
+  background: #fff;
+  border: 1px solid #e4eaf3;
+  border-radius: 1rem;
+  box-shadow: 0 .7rem 2rem rgba(16, 36, 71, .06);
+}
+
+.volunteer-empty {
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.volunteer-empty-icon {
+  align-items: center;
+  background: #d7f8ef;
+  border-radius: 50%;
+  color: #087f72;
+  display: inline-flex;
+  font-size: 1.5rem;
+  font-weight: 800;
+  height: 3.5rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+  width: 3.5rem;
+}
+
+.volunteer-empty h2 {
+  color: #102447;
+  font-size: 1.4rem;
+}
+
+.volunteer-empty p {
+  color: #5d6b82;
+  margin: 0 auto 1.5rem;
+  max-width: 32rem;
+}
+
+.volunteer-planning-list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.volunteer-planning-card {
+  overflow: hidden;
+}
+
+.volunteer-planning-heading {
+  align-items: center;
+  background: linear-gradient(110deg, #102447, #176b8d);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+}
+
+.volunteer-planning-heading h2 {
+  font-size: 1.35rem;
+  margin: .25rem 0 0;
+}
+
+.volunteer-planning-heading .text-muted {
+  color: #9deee0 !important;
+}
+
+.volunteer-planning-card .table {
+  --bs-table-bg: transparent;
+  margin: 0;
+}
+
+.volunteer-planning-card .table th {
+  color: #7a879b;
+  font-size: .75rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.volunteer-planning-card .table td,
+.volunteer-planning-card .table th {
+  border-color: #eef2f7;
+  padding: 1rem 1.5rem;
+}
+
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
@@ -265,5 +478,9 @@ body {
 
   .privacy-grid {
     grid-template-columns: 1fr;
+  }
+
+  .availability-calendar {
+    overflow-x: auto;
   }
 }

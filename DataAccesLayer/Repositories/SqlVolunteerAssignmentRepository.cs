@@ -16,6 +16,39 @@ public sealed class SqlVolunteerAssignmentRepository
         _dbContext = dbContext;
     }
 
+    public async Task<IReadOnlyList<Planning>> GetPlanningsByVolunteerIdAsync(
+        int userId)
+    {
+        var plannings = await _dbContext.Plannings
+            .AsNoTracking()
+            .AsSplitQuery()
+            .Where(planning => planning.ActivitySchedules
+                .Any(schedule => schedule.VolunteerAssignments
+                    .Any(assignment => assignment.UserId == userId)))
+            .Include(planning => planning.Event)
+            .Include(planning => planning.ActivitySchedules)
+                .ThenInclude(schedule => schedule.Activity)
+            .Include(planning => planning.ActivitySchedules)
+                .ThenInclude(schedule => schedule.Location)
+            .Include(planning => planning.ActivitySchedules)
+                .ThenInclude(schedule => schedule.TimeSlot)
+            .Include(planning => planning.ActivitySchedules)
+                .ThenInclude(schedule => schedule.VolunteerAssignments)
+            .OrderBy(planning => planning.Event.StartDate)
+            .ThenBy(planning => planning.Name)
+            .ToListAsync();
+
+        foreach (var planning in plannings)
+        {
+            planning.ActivitySchedules = planning.ActivitySchedules
+                .Where(schedule => schedule.VolunteerAssignments
+                    .Any(assignment => assignment.UserId == userId))
+                .ToList();
+        }
+
+        return plannings;
+    }
+
     public async Task<IReadOnlyList<User>> GetVolunteersByIdsAsync(
         IEnumerable<int> userIds)
     {

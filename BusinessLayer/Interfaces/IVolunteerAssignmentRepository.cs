@@ -4,6 +4,9 @@ namespace BusinessLayer.Interfaces;
 
 public interface IVolunteerAssignmentRepository
 {
+    Task<IReadOnlyList<Planning>> GetPlanningsByVolunteerIdAsync(
+        int userId);
+
     Task<IReadOnlyList<User>> GetVolunteersByIdsAsync(
         IEnumerable<int> userIds);
 
