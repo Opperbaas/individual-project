@@ -1,3 +1,4 @@
+using BusinessLayer.Interfaces;
 using BusinessLayer.Enums;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -8,9 +9,9 @@ namespace PresentationLayer.Controllers;
 
 public sealed class ActivityController : Controller
 {
-    private readonly ActivityService _activityService;
+    private readonly IActivityService _activityService;
 
-    public ActivityController(ActivityService activityService)
+    public ActivityController(IActivityService activityService)
     {
         _activityService = activityService;
     }

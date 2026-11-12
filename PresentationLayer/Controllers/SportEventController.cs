@@ -1,4 +1,5 @@
 using BusinessLayer.Enums;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace PresentationLayer.Controllers;
 
 public sealed class SportEventController : Controller
 {
-    private readonly SportEventService _sportEventService;
+    private readonly ISportEventService _sportEventService;
 
-    public SportEventController(SportEventService sportEventService)
+    public SportEventController(ISportEventService sportEventService)
     {
         _sportEventService = sportEventService;
     }

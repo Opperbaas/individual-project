@@ -1,4 +1,5 @@
 using BusinessLayer.Enums;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace PresentationLayer.Controllers;
 
 public sealed class TimeSlotController : Controller
 {
-    private readonly TimeSlotService _timeSlotService;
+    private readonly ITimeSlotService _timeSlotService;
 
-    public TimeSlotController(TimeSlotService timeSlotService)
+    public TimeSlotController(ITimeSlotService timeSlotService)
     {
         _timeSlotService = timeSlotService;
     }

@@ -4,7 +4,7 @@ using BusinessLayer.Interfaces;
 
 namespace BusinessLayer.Services;
 
-public sealed class VolunteerAssignmentService
+public sealed class VolunteerAssignmentService : IVolunteerAssignmentService
 {
     private readonly IVolunteerAssignmentRepository _repository;
 

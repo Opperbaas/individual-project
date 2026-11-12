@@ -3,7 +3,7 @@ using BusinessLayer.Interfaces;
 
 namespace BusinessLayer.Services;
 
-public sealed class SportEventService
+public sealed class SportEventService : ISportEventService
 {
     private readonly ISportEventRepository _sportEventRepository;
 

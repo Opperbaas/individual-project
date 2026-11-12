@@ -3,7 +3,7 @@ using BusinessLayer.Interfaces;
 
 namespace BusinessLayer.Services;
 
-public sealed class LocationService
+public sealed class LocationService : ILocationService
 {
     private readonly ILocationRepository _locationRepository;
 

@@ -26,14 +26,14 @@ builder.Services.AddScoped<IRegistrationRepository, SqlRegistrationRepository>()
 builder.Services.AddScoped<IVolunteerAssignmentRepository,
     SqlVolunteerAssignmentRepository>();
 builder.Services.AddScoped<ScheduleValidationService>();
-builder.Services.AddScoped<PlanningService>();
-builder.Services.AddScoped<SportEventService>();
-builder.Services.AddScoped<ActivityService>();
-builder.Services.AddScoped<LocationService>();
-builder.Services.AddScoped<TimeSlotService>();
-builder.Services.AddScoped<AvailabilityService>();
-builder.Services.AddScoped<RegistrationService>();
-builder.Services.AddScoped<VolunteerAssignmentService>();
+builder.Services.AddScoped<IPlanningService, PlanningService>();
+builder.Services.AddScoped<ISportEventService, SportEventService>();
+builder.Services.AddScoped<IActivityService, ActivityService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
+builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IVolunteerAssignmentService, VolunteerAssignmentService>();
 builder.Services.AddScoped<IPasswordHasher<AccountUserRecord>, PasswordHasher<AccountUserRecord>>();
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

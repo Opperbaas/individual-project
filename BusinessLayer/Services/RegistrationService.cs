@@ -3,7 +3,7 @@ using BusinessLayer.Interfaces;
 
 namespace BusinessLayer.Services;
 
-public sealed class RegistrationService
+public sealed class RegistrationService : IRegistrationService
 {
     private readonly IRegistrationRepository _registrationRepository;
 

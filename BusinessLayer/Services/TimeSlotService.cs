@@ -3,7 +3,7 @@ using BusinessLayer.Interfaces;
 
 namespace BusinessLayer.Services;
 
-public sealed class TimeSlotService
+public sealed class TimeSlotService : ITimeSlotService
 {
     private readonly ITimeSlotRepository _timeSlotRepository;
 

@@ -3,7 +3,7 @@ using BusinessLayer.Interfaces;
 
 namespace BusinessLayer.Services;
 
-public sealed class ActivityService
+public sealed class ActivityService : IActivityService
 {
     private readonly IActivityRepository _activityRepository;
 

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using BusinessLayer.DTOs;
 using BusinessLayer.Entities;
 using BusinessLayer.Enums;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,12 @@ namespace PresentationLayer.Controllers;
 
 public sealed class PlanningController : Controller
 {
-    private readonly PlanningService _planningService;
-    private readonly VolunteerAssignmentService _volunteerAssignmentService;
+    private readonly IPlanningService _planningService;
+    private readonly IVolunteerAssignmentService _volunteerAssignmentService;
 
     public PlanningController(
-        PlanningService planningService,
-        VolunteerAssignmentService volunteerAssignmentService)
+        IPlanningService planningService,
+        IVolunteerAssignmentService volunteerAssignmentService)
     {
         _planningService = planningService;
         _volunteerAssignmentService = volunteerAssignmentService;
@@ -118,9 +119,9 @@ public sealed class PlanningController : Controller
 
                 planning.ActivitySchedules.Add(new ActivitySchedule
                 {
-                    Activity = activity,
-                    Location = location,
-                    TimeSlot = timeSlot
+                    ActivityId = activity.ActivityId,
+                    LocationId = location.LocationId,
+                    TimeSlotId = timeSlot.TimeSlotId
                 });
             }
 

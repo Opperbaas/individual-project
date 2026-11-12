@@ -1,4 +1,5 @@
 using BusinessLayer.Enums;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace PresentationLayer.Controllers;
 
 public sealed class LocationController : Controller
 {
-    private readonly LocationService _locationService;
+    private readonly ILocationService _locationService;
 
-    public LocationController(LocationService locationService)
+    public LocationController(ILocationService locationService)
     {
         _locationService = locationService;
     }

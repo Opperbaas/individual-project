@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using BusinessLayer.Enums;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace PresentationLayer.Controllers;
 
 public sealed class RegistrationController : Controller
 {
-    private readonly RegistrationService _registrationService;
+    private readonly IRegistrationService _registrationService;
 
-    public RegistrationController(RegistrationService registrationService)
+    public RegistrationController(IRegistrationService registrationService)
     {
         _registrationService = registrationService;
     }

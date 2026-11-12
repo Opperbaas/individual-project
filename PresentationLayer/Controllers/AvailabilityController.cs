@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using BusinessLayer.Enums;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +10,9 @@ namespace PresentationLayer.Controllers;
 
 public sealed class AvailabilityController : Controller
 {
-    private readonly AvailabilityService _availabilityService;
+    private readonly IAvailabilityService _availabilityService;
 
-    public AvailabilityController(AvailabilityService availabilityService)
+    public AvailabilityController(IAvailabilityService availabilityService)
     {
         _availabilityService = availabilityService;
     }

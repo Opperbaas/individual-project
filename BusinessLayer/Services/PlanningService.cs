@@ -3,7 +3,7 @@ using BusinessLayer.Interfaces;
 
 namespace BusinessLayer.Services;
 
-public sealed class PlanningService
+public sealed class PlanningService : IPlanningService
 {
     private readonly IPlanningRepository _planningRepository;
     private readonly ScheduleValidationService _scheduleValidationService;
@@ -76,7 +76,7 @@ public sealed class PlanningService
         planning.CreatedAt = DateTime.UtcNow;
         if (string.IsNullOrWhiteSpace(planning.Status))
         {
-            planning.Status = "Draft";
+            planning.Status = "Proposed";
         }
 
         return await _planningRepository.CreateAsync(planning);

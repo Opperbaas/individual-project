@@ -3,7 +3,7 @@ using BusinessLayer.Interfaces;
 
 namespace BusinessLayer.Services;
 
-public sealed class AvailabilityService
+public sealed class AvailabilityService : IAvailabilityService
 {
     private readonly IAvailabilityRepository _availabilityRepository;
 
