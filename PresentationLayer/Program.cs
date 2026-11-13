@@ -3,6 +3,8 @@ using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using DataAccesLayer.Database;
 using DataAccesLayer.Repositories;
+using PresentationLayer.Interfaces;
+using PresentationLayer.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +36,9 @@ builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IVolunteerAssignmentService, VolunteerAssignmentService>();
+builder.Services.AddScoped<
+    IAvailabilityCalendarService,
+    AvailabilityCalendarService>();
 builder.Services.AddScoped<IPasswordHasher<AccountUserRecord>, PasswordHasher<AccountUserRecord>>();
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
