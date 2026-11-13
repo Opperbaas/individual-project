@@ -39,6 +39,7 @@ builder.Services.AddScoped<IVolunteerAssignmentService, VolunteerAssignmentServi
 builder.Services.AddScoped<
     IAvailabilityCalendarService,
     AvailabilityCalendarService>();
+builder.Services.AddScoped<IPlanningFormService, PlanningFormService>();
 builder.Services.AddScoped<IPasswordHasher<AccountUserRecord>, PasswordHasher<AccountUserRecord>>();
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

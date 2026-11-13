@@ -3,10 +3,9 @@ using BusinessLayer.DTOs;
 using BusinessLayer.Entities;
 using BusinessLayer.Enums;
 using BusinessLayer.Interfaces;
-using BusinessLayer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using PresentationLayer.Interfaces;
 using PresentationLayer.Models;
 
 namespace PresentationLayer.Controllers;
@@ -15,13 +14,16 @@ public sealed class PlanningController : Controller
 {
     private readonly IPlanningService _planningService;
     private readonly IVolunteerAssignmentService _volunteerAssignmentService;
+    private readonly IPlanningFormService _planningFormService;
 
     public PlanningController(
         IPlanningService planningService,
-        IVolunteerAssignmentService volunteerAssignmentService)
+        IVolunteerAssignmentService volunteerAssignmentService,
+        IPlanningFormService planningFormService)
     {
         _planningService = planningService;
         _volunteerAssignmentService = volunteerAssignmentService;
+        _planningFormService = planningFormService;
     }
 
     public async Task<IActionResult> Index(int eventId)
@@ -66,7 +68,9 @@ public sealed class PlanningController : Controller
             Schedules = [new PlanningScheduleViewModel()]
         };
 
-        await PopulateScheduleOptionsAsync(model.Schedules, eventId);
+        await _planningFormService.PopulateScheduleOptionsAsync(
+            model.Schedules,
+            eventId);
         return View("~/Views/PlanningPage/Create.cshtml", model);
     }
 
@@ -77,7 +81,9 @@ public sealed class PlanningController : Controller
     {
         if (!ModelState.IsValid)
         {
-            await PopulateScheduleOptionsAsync(model.Schedules, model.EventId);
+            await _planningFormService.PopulateScheduleOptionsAsync(
+                model.Schedules,
+                model.EventId);
             return View("~/Views/PlanningPage/Create.cshtml", model);
         }
 
@@ -113,7 +119,9 @@ public sealed class PlanningController : Controller
                     ModelState.AddModelError(
                         string.Empty,
                         "Kies een geldige activiteit, locatie en tijdslot.");
-                    await PopulateScheduleOptionsAsync(model.Schedules, model.EventId);
+                    await _planningFormService.PopulateScheduleOptionsAsync(
+                        model.Schedules,
+                        model.EventId);
                     return View("~/Views/PlanningPage/Create.cshtml", model);
                 }
 
@@ -148,52 +156,18 @@ public sealed class PlanningController : Controller
         catch (ArgumentException exception)
         {
             ModelState.AddModelError(string.Empty, exception.Message);
-            await PopulateScheduleOptionsAsync(model.Schedules, model.EventId);
+            await _planningFormService.PopulateScheduleOptionsAsync(
+                model.Schedules,
+                model.EventId);
             return View("~/Views/PlanningPage/Create.cshtml", model);
         }
         catch (InvalidOperationException exception)
         {
             ModelState.AddModelError(string.Empty, exception.Message);
-            await PopulateScheduleOptionsAsync(model.Schedules, model.EventId);
+            await _planningFormService.PopulateScheduleOptionsAsync(
+                model.Schedules,
+                model.EventId);
             return View("~/Views/PlanningPage/Create.cshtml", model);
-        }
-    }
-
-    private async Task PopulateScheduleOptionsAsync(
-        IEnumerable<PlanningScheduleViewModel> schedules,
-        int eventId)
-    {
-        var activities = await _planningService.GetActivitiesByEventIdAsync(eventId);
-        var locations = await _planningService.GetLocationsAsync();
-        var timeSlots = await _planningService.GetTimeSlotsByEventIdAsync(eventId);
-        var volunteers = await _planningService.GetVolunteersAsync();
-
-        foreach (var schedule in schedules)
-        {
-            schedule.Activities = activities.Select(activity => new SelectListItem
-            {
-                Value = activity.ActivityId.ToString(),
-                Text = activity.ActivityName,
-                Selected = activity.ActivityId == schedule.ActivityId
-            });
-            schedule.Locations = locations.Select(location => new SelectListItem
-            {
-                Value = location.LocationId.ToString(),
-                Text = location.Name,
-                Selected = location.LocationId == schedule.LocationId
-            });
-            schedule.TimeSlots = timeSlots.Select(timeSlot => new SelectListItem
-            {
-                Value = timeSlot.TimeSlotId.ToString(),
-                Text = $"{timeSlot.SlotDate:dd-MM-yyyy} {timeSlot.StartTime:HH\\:mm}-{timeSlot.EndTime:HH\\:mm}",
-                Selected = timeSlot.TimeSlotId == schedule.TimeSlotId
-            });
-            schedule.Volunteers = volunteers.Select(volunteer => new SelectListItem
-            {
-                Value = volunteer.UserId.ToString(),
-                Text = volunteer.Name,
-                Selected = schedule.VolunteerIds.Contains(volunteer.UserId)
-            });
         }
     }
 
