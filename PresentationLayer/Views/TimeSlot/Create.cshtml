@@ -30,6 +30,11 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Tijdslot toevoegen</button>
+    <a asp-controller="TimeSlot" asp-action="Generate"
+       asp-route-eventId="@Model.EventId"
+       class="btn btn-outline-primary">
+        Meerdere tijdsloten genereren
+    </a>
     <a asp-controller="Planning" asp-action="Index"
        asp-route-eventId="@Model.EventId"
        class="btn btn-outline-secondary">

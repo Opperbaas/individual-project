@@ -184,4 +184,33 @@ public sealed class PlanningController : Controller
             return View("~/Views/PlanningPage/Edit.cshtml", model);
         }
     }
+
+    [HttpPost]
+    [Authorize(Roles = RoleNames.Organizer)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest();
+        }
+
+        try
+        {
+            var planning = await _planningService.GetByIdAsync(id);
+            if (planning is null)
+            {
+                return NotFound();
+            }
+
+            await _planningService.DeleteAsync(id);
+            return RedirectToAction(
+                nameof(Index),
+                new { eventId = planning.EventId });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
 }

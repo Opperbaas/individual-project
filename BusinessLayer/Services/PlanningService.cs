@@ -99,6 +99,23 @@ public sealed class PlanningService : IPlanningService
         await _planningRepository.UpdateAsync(planning);
     }
 
+    public async Task DeleteAsync(int planningId)
+    {
+        if (planningId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(planningId));
+        }
+
+        var planning = await _planningRepository.GetByIdAsync(planningId);
+        if (planning is null)
+        {
+            throw new KeyNotFoundException(
+                $"Planning met ID {planningId} bestaat niet.");
+        }
+
+        await _planningRepository.DeleteAsync(planningId);
+    }
+
     public async Task<IReadOnlyList<string>> ValidateAsync(int planningId)
     {
         var planning = await GetExistingPlanningAsync(planningId);

@@ -1,4 +1,5 @@
 using BusinessLayer.Entities;
+using BusinessLayer.DTOs;
 
 namespace BusinessLayer.Interfaces;
 
@@ -9,4 +10,7 @@ public interface ITimeSlotService
         DateOnly slotDate,
         TimeOnly startTime,
         TimeOnly endTime);
+
+    Task<IReadOnlyList<TimeSlot>> GenerateAsync(
+        GenerateTimeSlotsRequest request);
 }

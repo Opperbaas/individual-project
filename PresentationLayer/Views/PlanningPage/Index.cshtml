@@ -31,14 +31,25 @@ else
     <div class="row g-4">
         @foreach (var planning in Model)
         {
+            var hasMissingVolunteers = planning.ActivitySchedules.Any() &&
+                planning.ActivitySchedules.Any(
+                    schedule => schedule.VolunteerAssignments.Count == 0);
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card h-100 shadow-sm @(hasMissingVolunteers ? "border-danger" : "")">
                     <div class="card-body">
                         <h2 class="h5 card-title">@planning.Name</h2>
                         <p class="card-text mb-2">
                             Status:
-                            <span class="badge text-bg-secondary">@planning.Status</span>
+                            <span class="badge @(hasMissingVolunteers ? "text-bg-danger" : "text-bg-secondary")">
+                                @(hasMissingVolunteers ? "Vrijwilliger ontbreekt" : planning.Status)
+                            </span>
                         </p>
+                        @if (hasMissingVolunteers)
+                        {
+                            <p class="text-danger">
+                                Voor één of meer activiteiten is nog geen vrijwilliger ingepland.
+                            </p>
+                        }
                         <p class="card-text text-muted">
                             Aangemaakt op @planning.CreatedAt.ToLocalTime().ToString("dd-MM-yyyy HH:mm")
                         </p>

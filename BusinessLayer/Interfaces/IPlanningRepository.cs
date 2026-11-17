@@ -12,4 +12,5 @@ public interface IPlanningRepository
     Task<IReadOnlyList<User>> GetVolunteersAsync();
     Task<Planning> CreateAsync(Planning planning);
     Task UpdateAsync(Planning planning);
+    Task DeleteAsync(int planningId);
 }

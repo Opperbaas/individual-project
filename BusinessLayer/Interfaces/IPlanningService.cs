@@ -12,6 +12,7 @@ public interface IPlanningService
     Task<IReadOnlyList<User>> GetVolunteersAsync();
     Task<Planning> CreateAsync(Planning planning);
     Task UpdateAsync(Planning planning);
+    Task DeleteAsync(int planningId);
     Task<IReadOnlyList<string>> ValidateAsync(int planningId);
     Task FinalizeAsync(int planningId);
 }

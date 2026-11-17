@@ -101,6 +101,29 @@ public sealed class SqlPlanningRepository : IPlanningRepository
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task DeleteAsync(int planningId)
+    {
+        var planning = await _dbContext.Plannings
+            .Include(item => item.ActivitySchedules)
+                .ThenInclude(schedule => schedule.VolunteerAssignments)
+            .SingleOrDefaultAsync(item => item.PlanningId == planningId);
+
+        if (planning is null)
+        {
+            throw new KeyNotFoundException(
+                $"Planning met ID {planningId} bestaat niet.");
+        }
+
+        var assignments = planning.ActivitySchedules
+            .SelectMany(schedule => schedule.VolunteerAssignments)
+            .ToList();
+
+        _dbContext.VolunteerAssignments.RemoveRange(assignments);
+        _dbContext.ActivitySchedules.RemoveRange(planning.ActivitySchedules);
+        _dbContext.Plannings.Remove(planning);
+        await _dbContext.SaveChangesAsync();
+    }
+
     private IQueryable<Planning> CreatePlanningQuery()
     {
         return _dbContext.Plannings

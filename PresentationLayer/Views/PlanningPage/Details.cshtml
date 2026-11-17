@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Planning details";
+    var hasMissingVolunteers = Model.ActivitySchedules.Any() &&
+        Model.ActivitySchedules.Any(
+            schedule => schedule.VolunteerAssignments.Count == 0);
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -9,17 +12,39 @@
         <h1>@Model.Name</h1>
         <p class="text-muted mb-0">Details van de planning.</p>
     </div>
-    <span class="badge text-bg-secondary fs-6">@Model.Status</span>
+    <span class="badge @(hasMissingVolunteers ? "text-bg-danger" : "text-bg-secondary") fs-6">
+        @(hasMissingVolunteers ? "Vrijwilliger ontbreekt" : Model.Status)
+    </span>
 </div>
+
+@if (hasMissingVolunteers)
+{
+    <div class="alert alert-danger">
+        Voor één of meer activiteiten is nog geen vrijwilliger ingepland.
+        Je kunt deze planning verwijderen en opnieuw aanmaken.
+    </div>
+}
 
 @if (User.IsInRole(RoleNames.Organizer))
 {
-    <a class="btn btn-outline-primary mb-4"
-       asp-controller="Planning"
-       asp-action="Edit"
-       asp-route-id="@Model.PlanningId">
-        Planning bewerken
-    </a>
+    <div class="d-flex gap-2 mb-4">
+        <a class="btn btn-outline-primary"
+           asp-controller="Planning"
+           asp-action="Edit"
+           asp-route-id="@Model.PlanningId">
+            Planning bewerken
+        </a>
+        <form asp-controller="Planning"
+              asp-action="Delete"
+              method="post"
+              onsubmit="return confirm('Weet je zeker dat je deze planning wilt verwijderen?');">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.PlanningId" />
+            <button type="submit" class="btn btn-outline-danger">
+                Planning verwijderen
+            </button>
+        </form>
+    </div>
 }
 
 <div class="card shadow-sm mb-4">
