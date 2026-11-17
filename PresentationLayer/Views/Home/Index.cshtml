@@ -1,8 +1,261 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Smart Sports Event Planner";
+    var isOrganizer = User.IsInRole(RoleNames.Organizer);
+    var isVolunteer = User.IsInRole(RoleNames.Volunteer);
+    var isParticipant = User.IsInRole(RoleNames.Participant);
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-page">
+    <section class="home-hero">
+        <div class="home-hero-content">
+            @if (isOrganizer)
+            {
+                <span class="home-eyebrow">Organizer dashboard</span>
+                <h1>Neem de leiding over jouw <span>sportevent.</span></h1>
+                <p class="home-hero-lead">
+                    Maak evenementen, bouw planningen en zorg dat jouw team
+                    klaarstaat voor de start.
+                </p>
+            }
+            else if (isVolunteer)
+            {
+                <span class="home-eyebrow">Volunteer hub</span>
+                <h1>Jouw inzet maakt het <span>verschil.</span></h1>
+                <p class="home-hero-lead">
+                    Bekijk jouw toegewezen planningen en ontdek waar jij het
+                    volgende sportevent sterker maakt.
+                </p>
+            }
+            else if (isParticipant)
+            {
+                <span class="home-eyebrow">Participant zone</span>
+                <h1>Vind jouw volgende <span>sportieve uitdaging.</span></h1>
+                <p class="home-hero-lead">
+                    Ontdek sportevenementen, schrijf je in en beleef elk event
+                    samen met andere deelnemers.
+                </p>
+            }
+            else
+            {
+                <span class="home-eyebrow">Plan. Perform. Together.</span>
+                <h1>Maak van elk sportevent een <span>topprestatie.</span></h1>
+                <p class="home-hero-lead">
+                    Organiseer evenementen, maak slimme planningen en verbind
+                    deelnemers en vrijwilligers op één sportief platform.
+                </p>
+            }
+
+            <div class="home-actions">
+                @if (isOrganizer)
+                {
+                    <a asp-controller="SportEvent" asp-action="Create"
+                       class="btn home-btn-primary">
+                        Nieuw sportevent
+                        <span aria-hidden="true">→</span>
+                    </a>
+                    <a asp-controller="SportEvent" asp-action="Index"
+                       class="btn home-btn-secondary">
+                        Mijn evenementen
+                    </a>
+                }
+                else if (isVolunteer)
+                {
+                    <a asp-controller="Volunteer" asp-action="Index"
+                       class="btn home-btn-primary">
+                        Mijn planning
+                        <span aria-hidden="true">→</span>
+                    </a>
+                    <a asp-controller="SportEvent" asp-action="Index"
+                       class="btn home-btn-secondary">
+                        Bekijk evenementen
+                    </a>
+                }
+                else if (isParticipant)
+                {
+                    <a asp-controller="SportEvent" asp-action="Index"
+                       class="btn home-btn-primary">
+                        Vind een evenement
+                        <span aria-hidden="true">→</span>
+                    </a>
+                }
+                else if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a asp-controller="SportEvent" asp-action="Index"
+                       class="btn home-btn-primary">
+                        Bekijk sportevenementen
+                        <span aria-hidden="true">→</span>
+                    </a>
+                    <a asp-controller="Account" asp-action="Register"
+                       class="btn home-btn-secondary">
+                        Account aanmaken
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="SportEvent" asp-action="Index"
+                       class="btn home-btn-primary">
+                        Bekijk sportevenementen
+                        <span aria-hidden="true">→</span>
+                    </a>
+                    <a asp-controller="SportEvent" asp-action="Index"
+                       class="btn home-btn-secondary">
+                        Bekijk evenementen
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="home-hero-visual" aria-hidden="true">
+            <div class="home-score-card">
+                <span class="home-score-label">NEXT MATCH</span>
+                <strong>SPORT</strong>
+                <div class="home-score-line">
+                    <span>TEAM</span>
+                    <b>24</b>
+                </div>
+                <div class="home-score-line">
+                    <span>EVENT</span>
+                    <b>7</b>
+                </div>
+                <div class="home-score-status">
+                    <i></i> Planning on track
+                </div>
+            </div>
+            <div class="home-orbit home-orbit-one"></div>
+            <div class="home-orbit home-orbit-two"></div>
+            <div class="home-hero-ball">+</div>
+        </div>
+    </section>
+
+    <section class="home-value-grid" aria-label="Mogelijkheden">
+        @if (isOrganizer)
+        {
+            <article class="home-value-card">
+                <span class="home-card-number">01</span>
+                <div class="home-card-icon home-card-icon-teal">+</div>
+                <h2>Events bouwen</h2>
+                <p>Maak sportevents aan en beheer alle informatie op één plek.</p>
+            </article>
+            <article class="home-value-card">
+                <span class="home-card-number">02</span>
+                <div class="home-card-icon home-card-icon-orange">●</div>
+                <h2>Teams organiseren</h2>
+                <p>Koppel activiteiten, locaties, tijdsloten en vrijwilligers.</p>
+            </article>
+            <article class="home-value-card">
+                <span class="home-card-number">03</span>
+                <div class="home-card-icon home-card-icon-blue">✓</div>
+                <h2>Alles onder controle</h2>
+                <p>Zie direct waar de planning compleet is en waar actie nodig is.</p>
+            </article>
+        }
+        else if (isVolunteer)
+        {
+            <article class="home-value-card">
+                <span class="home-card-number">01</span>
+                <div class="home-card-icon home-card-icon-teal">✓</div>
+                <h2>Mijn opdrachten</h2>
+                <p>Bekijk snel wanneer en waar jij als vrijwilliger nodig bent.</p>
+            </article>
+            <article class="home-value-card">
+                <span class="home-card-number">02</span>
+                <div class="home-card-icon home-card-icon-orange">●</div>
+                <h2>Jouw beschikbaarheid</h2>
+                <p>Houd jouw beschikbaarheid duidelijk en actueel bij.</p>
+            </article>
+            <article class="home-value-card">
+                <span class="home-card-number">03</span>
+                <div class="home-card-icon home-card-icon-blue">↗</div>
+                <h2>Samen sterk</h2>
+                <p>Help organisatoren om ieder event soepel te laten verlopen.</p>
+            </article>
+        }
+        else if (isParticipant)
+        {
+            <article class="home-value-card">
+                <span class="home-card-number">01</span>
+                <div class="home-card-icon home-card-icon-teal">↗</div>
+                <h2>Ontdek events</h2>
+                <p>Vind sportevenementen die passen bij jouw interesses.</p>
+            </article>
+            <article class="home-value-card">
+                <span class="home-card-number">02</span>
+                <div class="home-card-icon home-card-icon-orange">●</div>
+                <h2>Doe mee</h2>
+                <p>Schrijf je eenvoudig in en maak deel uit van het team.</p>
+            </article>
+            <article class="home-value-card">
+                <span class="home-card-number">03</span>
+                <div class="home-card-icon home-card-icon-blue">✓</div>
+                <h2>Blijf op de hoogte</h2>
+                <p>Alle belangrijke eventinformatie vind je overzichtelijk terug.</p>
+            </article>
+        }
+        else
+        {
+            <article class="home-value-card">
+                <span class="home-card-number">01</span>
+                <div class="home-card-icon home-card-icon-teal">↗</div>
+                <h2>Overzichtelijk plannen</h2>
+                <p>Alle activiteiten, locaties en tijdsloten helder bij elkaar.</p>
+            </article>
+            <article class="home-value-card">
+                <span class="home-card-number">02</span>
+                <div class="home-card-icon home-card-icon-orange">●</div>
+                <h2>Sterke teams</h2>
+                <p>Koppel vrijwilligers aan het juiste moment en de juiste plek.</p>
+            </article>
+            <article class="home-value-card">
+                <span class="home-card-number">03</span>
+                <div class="home-card-icon home-card-icon-blue">✓</div>
+                <h2>Zonder gedoe</h2>
+                <p>Werk samen vanuit één duidelijke en betrouwbare planning.</p>
+            </article>
+        }
+    </section>
+
+    <section class="home-bottom-panel">
+        <div>
+            @if (isOrganizer)
+            {
+                <span class="home-eyebrow home-eyebrow-dark">Organizer mode</span>
+                <h2>Klaar om jouw volgende event te organiseren?</h2>
+            }
+            else if (isVolunteer)
+            {
+                <span class="home-eyebrow home-eyebrow-dark">Volunteer mode</span>
+                <h2>Bekijk waar jouw hulp het verschil maakt.</h2>
+            }
+            else if (isParticipant)
+            {
+                <span class="home-eyebrow home-eyebrow-dark">Participant mode</span>
+                <h2>Jouw volgende sportieve uitdaging wacht.</h2>
+            }
+            else
+            {
+                <span class="home-eyebrow home-eyebrow-dark">Ready when you are</span>
+                <h2>Jouw volgende sportevent begint hier.</h2>
+            }
+        </div>
+        @if (isOrganizer)
+        {
+            <a asp-controller="SportEvent" asp-action="Create"
+               class="btn home-panel-button">
+                Event aanmaken <span aria-hidden="true">→</span>
+            </a>
+        }
+        else if (isVolunteer)
+        {
+            <a asp-controller="Volunteer" asp-action="Index"
+               class="btn home-panel-button">
+                Naar mijn planning <span aria-hidden="true">→</span>
+            </a>
+        }
+        else
+        {
+            <a asp-controller="SportEvent" asp-action="Index"
+               class="btn home-panel-button">
+                Naar de evenementen <span aria-hidden="true">→</span>
+            </a>
+        }
+    </section>
 </div>

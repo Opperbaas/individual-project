@@ -32,6 +32,19 @@ public sealed class VolunteerAssignmentService : IVolunteerAssignmentService
         await _repository.CreateManyAsync(assignments);
     }
 
+    public async Task ReplaceAsync(
+        IEnumerable<VolunteerAssignmentRequest> requests)
+    {
+        var requestList = requests.ToList();
+        var assignments = await PrepareAssignmentsAsync(requestList);
+        var scheduleIds = requestList
+            .Select(request => request.ActivityScheduleId)
+            .Distinct()
+            .ToArray();
+
+        await _repository.ReplaceAsync(scheduleIds, assignments);
+    }
+
     public async Task ValidateAsync(
         IEnumerable<VolunteerAssignmentRequest> requests)
     {

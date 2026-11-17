@@ -93,4 +93,19 @@ public sealed class SqlVolunteerAssignmentRepository
         _dbContext.VolunteerAssignments.AddRange(assignmentList);
         await _dbContext.SaveChangesAsync();
     }
+
+    public async Task ReplaceAsync(
+        IEnumerable<int> activityScheduleIds,
+        IEnumerable<VolunteerAssignment> assignments)
+    {
+        var scheduleIds = activityScheduleIds.Distinct().ToArray();
+        var existingAssignments = await _dbContext.VolunteerAssignments
+            .Where(assignment =>
+                scheduleIds.Contains(assignment.ActivityScheduleId))
+            .ToListAsync();
+
+        _dbContext.VolunteerAssignments.RemoveRange(existingAssignments);
+        _dbContext.VolunteerAssignments.AddRange(assignments);
+        await _dbContext.SaveChangesAsync();
+    }
 }

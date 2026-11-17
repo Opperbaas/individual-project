@@ -13,9 +13,13 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        <label class="form-label">Evenement</label>
+        <input value="@Model.EventName" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Planning</label>
+        <input value="@Model.Name" class="form-control" readonly />
     </div>
 
     <h2 class="h4 mt-4">Activiteitenschema's</h2>
@@ -35,36 +39,21 @@
                     <input asp-for="Schedules[index].ActivityScheduleId" type="hidden" />
 
                     <div class="mb-3">
-                        <label asp-for="Schedules[index].ActivityId" class="form-label"></label>
-                        <select asp-for="Schedules[index].ActivityId"
-                                asp-items="Model.Schedules[index].Activities"
-                                class="form-select">
-                            <option value="">Kies een activiteit</option>
-                        </select>
-                        <span asp-validation-for="Schedules[index].ActivityId"
-                              class="text-danger"></span>
+                        <label class="form-label">Activiteit</label>
+                        <input value="@Model.Schedules[index].Activities.Single(item => item.Selected).Text"
+                               class="form-control" readonly />
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Schedules[index].LocationId" class="form-label"></label>
-                        <select asp-for="Schedules[index].LocationId"
-                                asp-items="Model.Schedules[index].Locations"
-                                class="form-select">
-                            <option value="">Kies een locatie</option>
-                        </select>
-                        <span asp-validation-for="Schedules[index].LocationId"
-                              class="text-danger"></span>
+                        <label class="form-label">Locatie</label>
+                        <input value="@Model.Schedules[index].Locations.Single(item => item.Selected).Text"
+                               class="form-control" readonly />
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Schedules[index].TimeSlotId" class="form-label"></label>
-                        <select asp-for="Schedules[index].TimeSlotId"
-                                asp-items="Model.Schedules[index].TimeSlots"
-                                class="form-select">
-                            <option value="">Kies een tijdslot</option>
-                        </select>
-                        <span asp-validation-for="Schedules[index].TimeSlotId"
-                              class="text-danger"></span>
+                        <label class="form-label">Tijdslot</label>
+                        <input value="@Model.Schedules[index].TimeSlots.Single(item => item.Selected).Text"
+                               class="form-control" readonly />
                     </div>
 
                     <div class="mb-3">

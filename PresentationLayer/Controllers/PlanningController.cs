@@ -14,15 +14,18 @@ public sealed class PlanningController : Controller
     private readonly IPlanningService _planningService;
     private readonly IPlanningWorkflowService _planningWorkflowService;
     private readonly IPlanningFormService _planningFormService;
+    private readonly IVolunteerAssignmentService _volunteerAssignmentService;
 
     public PlanningController(
         IPlanningService planningService,
         IPlanningWorkflowService planningWorkflowService,
-        IPlanningFormService planningFormService)
+        IPlanningFormService planningFormService,
+        IVolunteerAssignmentService volunteerAssignmentService)
     {
         _planningService = planningService;
         _planningWorkflowService = planningWorkflowService;
         _planningFormService = planningFormService;
+        _volunteerAssignmentService = volunteerAssignmentService;
     }
 
     public async Task<IActionResult> Index(int eventId)
@@ -146,12 +149,30 @@ public sealed class PlanningController : Controller
             return NotFound();
         }
 
-        return View("~/Views/PlanningPage/Edit.cshtml", new EditPlanningViewModel
+        var model = new EditPlanningViewModel
         {
             PlanningId = planning.PlanningId,
             EventId = planning.EventId,
-            Name = planning.Name
-        });
+            EventName = planning.Event.EventName,
+            Name = planning.Name,
+            Schedules = planning.ActivitySchedules
+                .Select(schedule => new PlanningScheduleViewModel
+                {
+                    ActivityScheduleId = schedule.ActivityScheduleId,
+                    ActivityId = schedule.ActivityId,
+                    LocationId = schedule.LocationId,
+                    TimeSlotId = schedule.TimeSlotId,
+                    VolunteerIds = schedule.VolunteerAssignments
+                        .Select(assignment => assignment.UserId)
+                        .ToList()
+                })
+                .ToList()
+        };
+
+        await _planningFormService.PopulateScheduleOptionsAsync(
+            model.Schedules,
+            model.EventId);
+        return View("~/Views/PlanningPage/Edit.cshtml", model);
     }
 
     [HttpPost]
@@ -170,17 +191,42 @@ public sealed class PlanningController : Controller
             return NotFound();
         }
 
-        planning.EventId = model.EventId;
-        planning.Name = model.Name;
-
         try
         {
-            await _planningService.UpdateAsync(planning);
+            var scheduleRequests = planning.ActivitySchedules
+                .Select(schedule =>
+                {
+                    var submittedSchedule = model.Schedules
+                        .SingleOrDefault(item =>
+                            item.ActivityScheduleId ==
+                            schedule.ActivityScheduleId);
+
+                    return new VolunteerAssignmentRequest
+                    {
+                        ActivityScheduleId = schedule.ActivityScheduleId,
+                        TimeSlotId = schedule.TimeSlotId,
+                        VolunteerIds = submittedSchedule?.VolunteerIds ?? []
+                    };
+                })
+                .ToList();
+
+            await _volunteerAssignmentService.ReplaceAsync(scheduleRequests);
             return RedirectToAction(nameof(Details), new { id = planning.PlanningId });
         }
         catch (ArgumentException exception)
         {
             ModelState.AddModelError(string.Empty, exception.Message);
+            await _planningFormService.PopulateScheduleOptionsAsync(
+                model.Schedules,
+                model.EventId);
+            return View("~/Views/PlanningPage/Edit.cshtml", model);
+        }
+        catch (InvalidOperationException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            await _planningFormService.PopulateScheduleOptionsAsync(
+                model.Schedules,
+                model.EventId);
             return View("~/Views/PlanningPage/Edit.cshtml", model);
         }
     }

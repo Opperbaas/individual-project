@@ -10,11 +10,8 @@ public sealed class EditPlanningViewModel
     [Required]
     public int EventId { get; set; }
 
-    [Required]
-    [StringLength(200)]
-    [Display(Name = "Naam")]
+    public string EventName { get; set; } = "";
     public string Name { get; set; } = "";
-
 
     public List<PlanningScheduleViewModel> Schedules { get; set; } = [];
 }

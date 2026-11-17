@@ -18,4 +18,7 @@ public interface IVolunteerAssignmentRepository
         TimeOnly endTime);
 
     Task CreateManyAsync(IEnumerable<VolunteerAssignment> assignments);
+    Task ReplaceAsync(
+        IEnumerable<int> activityScheduleIds,
+        IEnumerable<VolunteerAssignment> assignments);
 }
