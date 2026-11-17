@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using BusinessLayer.DTOs;
-using BusinessLayer.Entities;
 using BusinessLayer.Enums;
 using BusinessLayer.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -13,16 +12,16 @@ namespace PresentationLayer.Controllers;
 public sealed class PlanningController : Controller
 {
     private readonly IPlanningService _planningService;
-    private readonly IVolunteerAssignmentService _volunteerAssignmentService;
+    private readonly IPlanningWorkflowService _planningWorkflowService;
     private readonly IPlanningFormService _planningFormService;
 
     public PlanningController(
         IPlanningService planningService,
-        IVolunteerAssignmentService volunteerAssignmentService,
+        IPlanningWorkflowService planningWorkflowService,
         IPlanningFormService planningFormService)
     {
         _planningService = planningService;
-        _volunteerAssignmentService = volunteerAssignmentService;
+        _planningWorkflowService = planningWorkflowService;
         _planningFormService = planningFormService;
     }
 
@@ -94,62 +93,23 @@ public sealed class PlanningController : Controller
 
         try
         {
-            var planning = new Planning
+            var request = new CreatePlanningRequest
             {
                 EventId = model.EventId,
                 CreatedByUserId = userId,
-                Name = model.Name
-            };
-
-            var activities = await _planningService.GetActivitiesByEventIdAsync(model.EventId);
-            var locations = await _planningService.GetLocationsAsync();
-            var timeSlots = await _planningService.GetTimeSlotsByEventIdAsync(model.EventId);
-
-            foreach (var scheduleModel in model.Schedules)
-            {
-                var activity = activities.SingleOrDefault(
-                    item => item.ActivityId == scheduleModel.ActivityId);
-                var location = locations.SingleOrDefault(
-                    item => item.LocationId == scheduleModel.LocationId);
-                var timeSlot = timeSlots.SingleOrDefault(
-                    item => item.TimeSlotId == scheduleModel.TimeSlotId);
-
-                if (activity is null || location is null || timeSlot is null)
-                {
-                    ModelState.AddModelError(
-                        string.Empty,
-                        "Kies een geldige activiteit, locatie en tijdslot.");
-                    await _planningFormService.PopulateScheduleOptionsAsync(
-                        model.Schedules,
-                        model.EventId);
-                    return View("~/Views/PlanningPage/Create.cshtml", model);
-                }
-
-                planning.ActivitySchedules.Add(new ActivitySchedule
-                {
-                    ActivityId = activity.ActivityId,
-                    LocationId = location.LocationId,
-                    TimeSlotId = timeSlot.TimeSlotId,
-                    Activity = activity,
-                    Location = location,
-                    TimeSlot = timeSlot
-                });
-            }
-
-            planning = await _planningService.CreateAsync(planning);
-
-            var assignmentRequests = planning.ActivitySchedules
-                .Zip(model.Schedules, (activitySchedule, schedule) =>
-                    new VolunteerAssignmentRequest
+                Name = model.Name,
+                Schedules = model.Schedules
+                    .Select(schedule => new CreatePlanningScheduleRequest
                     {
-                        ActivityScheduleId = activitySchedule.ActivityScheduleId,
+                        ActivityId = schedule.ActivityId,
+                        LocationId = schedule.LocationId,
                         TimeSlotId = schedule.TimeSlotId,
                         VolunteerIds = schedule.VolunteerIds
                     })
-                .ToList();
+                    .ToList()
+            };
 
-            await _volunteerAssignmentService.ValidateAsync(assignmentRequests);
-            await _volunteerAssignmentService.AssignAsync(assignmentRequests);
+            var planning = await _planningWorkflowService.CreateAsync(request);
 
             return RedirectToAction(nameof(Details), new { id = planning.PlanningId });
         }

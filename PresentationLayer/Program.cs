@@ -29,6 +29,9 @@ builder.Services.AddScoped<IVolunteerAssignmentRepository,
     SqlVolunteerAssignmentRepository>();
 builder.Services.AddScoped<ScheduleValidationService>();
 builder.Services.AddScoped<IPlanningService, PlanningService>();
+builder.Services.AddScoped<
+    IPlanningWorkflowService,
+    PlanningWorkflowService>();
 builder.Services.AddScoped<ISportEventService, SportEventService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
