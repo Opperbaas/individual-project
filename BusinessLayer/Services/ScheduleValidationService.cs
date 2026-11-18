@@ -6,12 +6,36 @@ public sealed class ScheduleValidationService
 {
     public IReadOnlyList<string> Validate(
         Planning planning,
-        IEnumerable<Planning>? existingPlannings = null)
+        IEnumerable<Planning>? existingPlannings = null,
+        IEnumerable<Activity>? activities = null)
     {
         ArgumentNullException.ThrowIfNull(planning);
 
         var errors = new List<string>();
         var schedules = planning.ActivitySchedules.ToList();
+
+        if (schedules.Count == 0)
+        {
+            errors.Add("Een planning moet ten minste één activiteitenschema bevatten.");
+        }
+
+        foreach (var activity in activities ?? [])
+        {
+            var scheduleCount = schedules.Count(schedule =>
+                schedule.ActivityId == activity.ActivityId);
+
+            if (scheduleCount == 0)
+            {
+                errors.Add(
+                    $"Activiteit {activity.ActivityName} ontbreekt in de planning.");
+            }
+
+            if (scheduleCount > 1)
+            {
+                errors.Add(
+                    $"Activiteit {activity.ActivityName} is meer dan één keer ingepland.");
+            }
+        }
 
         foreach (var schedule in schedules)
         {
@@ -37,6 +61,14 @@ public sealed class ScheduleValidationService
             {
                 errors.Add(
                     $"Het tijdslot van activiteit {schedule.ActivityId} valt buiten de datum van het evenement.");
+            }
+
+            if (schedule.Activity is not null &&
+                schedule.Location is not null &&
+                schedule.Location.Capacity < schedule.Activity.MaxParticipants)
+            {
+                errors.Add(
+                    $"Locatie {schedule.Location.Name} heeft onvoldoende capaciteit voor activiteit {schedule.Activity.ActivityName}.");
             }
         }
 

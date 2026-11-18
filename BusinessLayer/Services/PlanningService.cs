@@ -71,7 +71,8 @@ public sealed class PlanningService : IPlanningService
         ArgumentNullException.ThrowIfNull(planning);
         ValidatePlanning(planning);
         var existingPlannings = await GetPlanningsForEventAsync(planning.EventId);
-        EnsureValidSchedule(planning, existingPlannings);
+        var activities = await GetActivitiesForEventAsync(planning.EventId);
+        EnsureValidSchedule(planning, existingPlannings, activities);
 
         planning.CreatedAt = DateTime.UtcNow;
         if (string.IsNullOrWhiteSpace(planning.Status))
@@ -95,7 +96,8 @@ public sealed class PlanningService : IPlanningService
         }
 
         var existingPlannings = await GetPlanningsForEventAsync(planning.EventId);
-        EnsureValidSchedule(planning, existingPlannings);
+        var activities = await GetActivitiesForEventAsync(planning.EventId);
+        EnsureValidSchedule(planning, existingPlannings, activities);
         await _planningRepository.UpdateAsync(planning);
     }
 
@@ -120,16 +122,22 @@ public sealed class PlanningService : IPlanningService
     {
         var planning = await GetExistingPlanningAsync(planningId);
         var existingPlannings = await GetPlanningsForEventAsync(planning.EventId);
-        return _scheduleValidationService.Validate(planning, existingPlannings);
+        var activities = await GetActivitiesForEventAsync(planning.EventId);
+        return _scheduleValidationService.Validate(
+            planning,
+            existingPlannings,
+            activities);
     }
 
     public async Task FinalizeAsync(int planningId)
     {
         var planning = await GetExistingPlanningAsync(planningId);
         var existingPlannings = await GetPlanningsForEventAsync(planning.EventId);
+        var activities = await GetActivitiesForEventAsync(planning.EventId);
         var validationErrors = _scheduleValidationService.Validate(
             planning,
-            existingPlannings);
+            existingPlannings,
+            activities);
 
         if (validationErrors.Count > 0)
         {
@@ -160,11 +168,13 @@ public sealed class PlanningService : IPlanningService
 
     private void EnsureValidSchedule(
         Planning planning,
-        IEnumerable<Planning> existingPlannings)
+        IEnumerable<Planning> existingPlannings,
+        IEnumerable<Activity>? activities = null)
     {
         var validationErrors = _scheduleValidationService.Validate(
             planning,
-            existingPlannings);
+            existingPlannings,
+            activities);
         if (validationErrors.Count > 0)
         {
             throw new ArgumentException(
@@ -176,6 +186,11 @@ public sealed class PlanningService : IPlanningService
     private Task<IReadOnlyList<Planning>> GetPlanningsForEventAsync(int eventId)
     {
         return _planningRepository.GetByEventIdAsync(eventId);
+    }
+
+    private Task<IReadOnlyList<Activity>> GetActivitiesForEventAsync(int eventId)
+    {
+        return _planningRepository.GetActivitiesByEventIdAsync(eventId);
     }
 
     private static void ValidatePlanning(Planning planning)

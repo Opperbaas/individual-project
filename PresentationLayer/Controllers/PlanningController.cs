@@ -164,6 +164,11 @@ public sealed class PlanningController : Controller
 
             return RedirectToAction(nameof(Details), new { id = planning.PlanningId });
         }
+        catch (ArgumentException exception)
+        {
+            TempData["PlanningError"] = exception.Message;
+            return RedirectToAction(nameof(Index), new { eventId });
+        }
         catch (InvalidOperationException exception)
         {
             TempData["PlanningError"] = exception.Message;

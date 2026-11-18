@@ -37,8 +37,22 @@ public sealed class OpenAiPlanningGenerator : IPlanningGenerator
         var activities =
             await _planningRepository.GetActivitiesByEventIdAsync(planning.EventId);
         var locations = await _planningRepository.GetLocationsAsync();
-        var timeSlots =
+        var allTimeSlots =
             await _planningRepository.GetTimeSlotsByEventIdAsync(planning.EventId);
+        var eventStart = planning.Event is null
+            ? (DateOnly?)null
+            : DateOnly.FromDateTime(planning.Event.StartDate);
+        var eventEnd = planning.Event is null
+            ? (DateOnly?)null
+            : DateOnly.FromDateTime(planning.Event.EndDate);
+
+        var timeSlots = eventStart is null || eventEnd is null
+            ? allTimeSlots
+            : allTimeSlots
+                .Where(timeSlot =>
+                    timeSlot.SlotDate >= eventStart &&
+                    timeSlot.SlotDate <= eventEnd)
+                .ToList();
 
         if (activities.Count == 0 || locations.Count == 0 || timeSlots.Count == 0)
         {
@@ -87,8 +101,11 @@ public sealed class OpenAiPlanningGenerator : IPlanningGenerator
                         """
                         Maak een haalbare sportevenementplanning.
                         Gebruik uitsluitend de aangeleverde IDs.
-                        Gebruik ieder tijdslot en iedere locatie maximaal één keer
-                        voor overlappende activiteiten.
+                        Plan iedere activiteit exact één keer.
+                        Gebruik geen dezelfde locatie voor activiteiten waarvan de
+                        tijdsloten op dezelfde datum overlappen.
+                        Gebruik geen dezelfde activiteit meer dan één keer.
+                        Kies uitsluitend tijdsloten die binnen de eventdata liggen.
                         Geef uitsluitend JSON terug in de vorm:
                         {"schedules":[{"activityId":1,"locationId":2,"timeSlotId":3}]}
                         """
@@ -116,8 +133,11 @@ public sealed class OpenAiPlanningGenerator : IPlanningGenerator
 
         if (!response.IsSuccessStatusCode)
         {
+            var errorMessage = GetOpenAiErrorMessage(responseBody);
             throw new InvalidOperationException(
-                $"OpenAI kon geen planning genereren ({(int)response.StatusCode}).");
+                $"OpenAI kon geen planning genereren " +
+                $"({(int)response.StatusCode} {response.ReasonPhrase}). " +
+                $"{errorMessage}");
         }
 
         try
@@ -148,6 +168,8 @@ public sealed class OpenAiPlanningGenerator : IPlanningGenerator
                     "OpenAI gaf geen activiteitenschema's terug.");
             }
 
+            var uniqueSchedules = new HashSet<string>();
+
             foreach (var schedule in generated.Schedules)
             {
                 var activity = activities.SingleOrDefault(
@@ -161,6 +183,14 @@ public sealed class OpenAiPlanningGenerator : IPlanningGenerator
                 {
                     throw new InvalidOperationException(
                         "OpenAI gaf een ID terug die niet bij dit evenement hoort.");
+                }
+
+                var scheduleKey =
+                    $"{schedule.ActivityId}:{schedule.LocationId}:{schedule.TimeSlotId}";
+                if (!uniqueSchedules.Add(scheduleKey))
+                {
+                    throw new InvalidOperationException(
+                        "OpenAI gaf hetzelfde activiteitenschema meerdere keren terug.");
                 }
 
                 planning.ActivitySchedules.Add(new ActivitySchedule
@@ -188,6 +218,27 @@ public sealed class OpenAiPlanningGenerator : IPlanningGenerator
             throw new InvalidOperationException(
                 "OpenAI gaf een onverwachte antwoordstructuur terug.",
                 exception);
+        }
+    }
+
+    private static string GetOpenAiErrorMessage(string responseBody)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(responseBody);
+            return document.RootElement
+                .GetProperty("error")
+                .GetProperty("message")
+                .GetString()
+                ?? "Controleer de OpenAI-configuratie.";
+        }
+        catch (JsonException)
+        {
+            return "Controleer de OpenAI-configuratie en het ingestelde model.";
+        }
+        catch (InvalidOperationException)
+        {
+            return "Controleer de OpenAI-configuratie en het ingestelde model.";
         }
     }
 

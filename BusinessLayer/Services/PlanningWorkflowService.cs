@@ -9,15 +9,18 @@ public sealed class PlanningWorkflowService : IPlanningWorkflowService
     private readonly IPlanningService _planningService;
     private readonly IVolunteerAssignmentService _volunteerAssignmentService;
     private readonly IPlanningGenerator _planningGenerator;
+    private readonly ISportEventService _sportEventService;
 
     public PlanningWorkflowService(
         IPlanningService planningService,
         IVolunteerAssignmentService volunteerAssignmentService,
-        IPlanningGenerator planningGenerator)
+        IPlanningGenerator planningGenerator,
+        ISportEventService sportEventService)
     {
         _planningService = planningService;
         _volunteerAssignmentService = volunteerAssignmentService;
         _planningGenerator = planningGenerator;
+        _sportEventService = sportEventService;
     }
 
     public async Task<Planning> GenerateWithAiAsync(
@@ -26,11 +29,19 @@ public sealed class PlanningWorkflowService : IPlanningWorkflowService
         string name,
         CancellationToken cancellationToken = default)
     {
+        var sportEvent = await _sportEventService.GetByIdAsync(eventId);
+        if (sportEvent is null)
+        {
+            throw new InvalidOperationException(
+                "Het evenement waarvoor een planning wordt gegenereerd bestaat niet.");
+        }
+
         var planning = new Planning
         {
             EventId = eventId,
             CreatedByUserId = createdByUserId,
-            Name = name
+            Name = name,
+            Event = sportEvent
         };
 
         planning = await _planningGenerator.GenerateAsync(
