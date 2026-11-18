@@ -1,0 +1,39 @@
+@model PresentationLayer.Models.CreateActivityViewModel
+
+@{
+    ViewData["Title"] = "Activiteit bewerken";
+}
+
+<h1>Activiteit bewerken</h1>
+
+<form asp-controller="Activity" asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="ActivityId" type="hidden" />
+    <input asp-for="EventId" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="ActivityName" class="form-label"></label>
+        <input asp-for="ActivityName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="ActivityType" class="form-label"></label>
+        <input asp-for="ActivityType" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+    </div>
+    <div class="mb-3">
+        <label asp-for="MaxParticipants" class="form-label"></label>
+        <input asp-for="MaxParticipants" type="number" min="1" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Wijzigingen opslaan</button>
+    <a asp-controller="SportEvent"
+       asp-action="Manage"
+       asp-route-id="@Model.EventId"
+       class="btn btn-outline-secondary">
+        Annuleren
+    </a>
+</form>

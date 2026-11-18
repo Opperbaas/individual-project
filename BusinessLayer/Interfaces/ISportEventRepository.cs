@@ -7,4 +7,6 @@ public interface ISportEventRepository
     Task<IReadOnlyList<SportEvent>> GetAllAsync();
     Task<SportEvent?> GetByIdAsync(int eventId);
     Task<SportEvent> CreateAsync(SportEvent sportEvent);
+    Task UpdateAsync(SportEvent sportEvent);
+    Task DeleteAsync(int eventId);
 }

@@ -1,0 +1,35 @@
+@model PresentationLayer.Models.CreateTimeSlotViewModel
+
+@{
+    ViewData["Title"] = "Tijdslot bewerken";
+}
+
+<h1>Tijdslot bewerken</h1>
+
+<form asp-controller="TimeSlot" asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="TimeSlotId" type="hidden" />
+    <input asp-for="EventId" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="SlotDate" class="form-label"></label>
+        <input asp-for="SlotDate" type="date" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="StartTime" class="form-label"></label>
+        <input asp-for="StartTime" type="time" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="EndTime" class="form-label"></label>
+        <input asp-for="EndTime" type="time" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Wijzigingen opslaan</button>
+    <a asp-controller="SportEvent"
+       asp-action="Manage"
+       asp-route-id="@Model.EventId"
+       class="btn btn-outline-secondary">
+        Annuleren
+    </a>
+</form>

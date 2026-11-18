@@ -11,4 +11,11 @@ public interface ISportEventService
         string description,
         DateTime startDate,
         DateTime endDate);
+    Task UpdateAsync(
+        int eventId,
+        string eventName,
+        string description,
+        DateTime startDate,
+        DateTime endDate);
+    Task DeleteAsync(int eventId);
 }

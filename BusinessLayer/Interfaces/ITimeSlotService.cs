@@ -13,4 +13,12 @@ public interface ITimeSlotService
 
     Task<IReadOnlyList<TimeSlot>> GenerateAsync(
         GenerateTimeSlotsRequest request);
+    Task<TimeSlot?> GetByIdAsync(int timeSlotId);
+    Task UpdateAsync(
+        int timeSlotId,
+        int eventId,
+        DateOnly slotDate,
+        TimeOnly startTime,
+        TimeOnly endTime);
+    Task DeleteAsync(int timeSlotId);
 }

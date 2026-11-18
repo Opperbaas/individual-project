@@ -54,4 +54,48 @@ public sealed class SportEventService : ISportEventService
             EndDate = endDate
         });
     }
+
+    public async Task UpdateAsync(
+        int eventId,
+        string eventName,
+        string description,
+        DateTime startDate,
+        DateTime endDate)
+    {
+        if (eventId <= 0)
+        {
+            throw new ArgumentException("Het sportevenement is ongeldig.");
+        }
+
+        if (string.IsNullOrWhiteSpace(eventName))
+        {
+            throw new ArgumentException(
+                "Een sportevenement moet een naam hebben.");
+        }
+
+        if (startDate > endDate)
+        {
+            throw new ArgumentException(
+                "De begindatum mag niet na de einddatum liggen.");
+        }
+
+        await _sportEventRepository.UpdateAsync(new SportEvent
+        {
+            EventId = eventId,
+            EventName = eventName.Trim(),
+            Description = description?.Trim() ?? "",
+            StartDate = startDate,
+            EndDate = endDate
+        });
+    }
+
+    public Task DeleteAsync(int eventId)
+    {
+        if (eventId <= 0)
+        {
+            throw new ArgumentException("Het sportevenement is ongeldig.");
+        }
+
+        return _sportEventRepository.DeleteAsync(eventId);
+    }
 }

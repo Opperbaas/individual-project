@@ -19,4 +19,13 @@ public interface IActivityService
         int locationCapacity,
         int maxParticipants,
         int count);
+    Task<Activity?> GetByIdAsync(int activityId);
+    Task UpdateAsync(
+        int activityId,
+        int eventId,
+        string activityName,
+        string activityType,
+        string description,
+        int maxParticipants);
+    Task DeleteAsync(int activityId);
 }

@@ -39,4 +39,45 @@ public sealed class SqlSportEventRepository : ISportEventRepository
 
         return sportEvent;
     }
+
+    public async Task UpdateAsync(SportEvent sportEvent)
+    {
+        ArgumentNullException.ThrowIfNull(sportEvent);
+        var existing = await _dbContext.SportEvents
+            .SingleOrDefaultAsync(item => item.EventId == sportEvent.EventId);
+        if (existing is null)
+        {
+            throw new KeyNotFoundException("Het sportevenement bestaat niet.");
+        }
+
+        existing.EventName = sportEvent.EventName;
+        existing.Description = sportEvent.Description;
+        existing.StartDate = sportEvent.StartDate;
+        existing.EndDate = sportEvent.EndDate;
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int eventId)
+    {
+        var existing = await _dbContext.SportEvents
+            .SingleOrDefaultAsync(item => item.EventId == eventId);
+        if (existing is null)
+        {
+            throw new KeyNotFoundException("Het sportevenement bestaat niet.");
+        }
+
+        var hasDependencies = await _dbContext.Activities
+            .AnyAsync(item => item.EventId == eventId) ||
+            await _dbContext.TimeSlots.AnyAsync(item => item.EventId == eventId) ||
+            await _dbContext.Plannings.AnyAsync(item => item.EventId == eventId);
+
+        if (hasDependencies)
+        {
+            throw new InvalidOperationException(
+                "Het evenement kan niet worden verwijderd omdat er activiteiten, tijdsloten of planningen aan gekoppeld zijn.");
+        }
+
+        _dbContext.SportEvents.Remove(existing);
+        await _dbContext.SaveChangesAsync();
+    }
 }

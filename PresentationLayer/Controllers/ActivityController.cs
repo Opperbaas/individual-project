@@ -59,4 +59,82 @@ public sealed class ActivityController : Controller
             return View("~/Views/Activity/Create.cshtml", model);
         }
     }
+
+    [HttpGet]
+    [Authorize(Roles = RoleNames.Organizer)]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var activity = await _activityService.GetByIdAsync(id);
+        if (activity is null)
+        {
+            return NotFound();
+        }
+
+        return View("~/Views/Activity/Edit.cshtml",
+            new CreateActivityViewModel
+            {
+                EventId = activity.EventId,
+                ActivityId = id,
+                ActivityName = activity.ActivityName,
+                ActivityType = activity.ActivityType,
+                Description = activity.Description,
+                MaxParticipants = activity.MaxParticipants
+            });
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RoleNames.Organizer)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(CreateActivityViewModel model)
+    {
+        try
+        {
+            await _activityService.UpdateAsync(
+                model.ActivityId,
+                model.EventId,
+                model.ActivityName,
+                model.ActivityType,
+                model.Description,
+                model.MaxParticipants);
+            return RedirectToAction(
+                "Manage",
+                "SportEvent",
+                new { id = model.EventId });
+        }
+        catch (ArgumentException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            return View("~/Views/Activity/Edit.cshtml", model);
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RoleNames.Organizer)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var activity = await _activityService.GetByIdAsync(id);
+        if (activity is null)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            await _activityService.DeleteAsync(id);
+            TempData["EventManageSuccess"] = "De activiteit is verwijderd.";
+            return RedirectToAction(
+                "Manage",
+                "SportEvent",
+                new { id = activity.EventId });
+        }
+        catch (InvalidOperationException exception)
+        {
+            TempData["EventManageError"] = exception.Message;
+            return RedirectToAction(
+                "Manage",
+                "SportEvent",
+                new { id = activity.EventId });
+        }
+    }
 }

@@ -47,4 +47,59 @@ public sealed class LocationService : ILocationService
             Description = description?.Trim() ?? ""
         });
     }
+
+    public Task<Location?> GetByIdAsync(int locationId)
+    {
+        if (locationId <= 0)
+        {
+            throw new ArgumentException("De locatie is ongeldig.");
+        }
+
+        return _locationRepository.GetByIdAsync(locationId);
+    }
+
+    public Task<IReadOnlyList<Location>> GetAllAsync()
+    {
+        return _locationRepository.GetAllAsync();
+    }
+
+    public Task UpdateAsync(
+        int locationId,
+        string name,
+        string locationType,
+        int capacity,
+        string description)
+    {
+        if (locationId <= 0)
+        {
+            throw new ArgumentException("De locatie is ongeldig.");
+        }
+
+        if (string.IsNullOrWhiteSpace(name) ||
+            string.IsNullOrWhiteSpace(locationType) ||
+            capacity <= 0)
+        {
+            throw new ArgumentException(
+                "Naam, locatietype en capaciteit zijn verplicht.");
+        }
+
+        return _locationRepository.UpdateAsync(new Location
+        {
+            LocationId = locationId,
+            Name = name.Trim(),
+            LocationType = locationType.Trim(),
+            Capacity = capacity,
+            Description = description?.Trim() ?? ""
+        });
+    }
+
+    public Task DeleteAsync(int locationId)
+    {
+        if (locationId <= 0)
+        {
+            throw new ArgumentException("De locatie is ongeldig.");
+        }
+
+        return _locationRepository.DeleteAsync(locationId);
+    }
 }

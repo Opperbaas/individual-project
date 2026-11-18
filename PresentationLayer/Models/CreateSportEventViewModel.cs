@@ -4,6 +4,7 @@ namespace PresentationLayer.Models;
 
 public sealed class CreateSportEventViewModel
 {
+    public int EventId { get; set; }
     [Required]
     [StringLength(200)]
     [Display(Name = "Naam")]

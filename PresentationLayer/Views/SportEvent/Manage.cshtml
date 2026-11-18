@@ -6,7 +6,25 @@
     ViewData["Title"] = "Evenement beheren";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<style>
+    .manage-overview-card {
+        max-height: 560px;
+        overflow: hidden;
+    }
+
+    .manage-overview-card .card-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .manage-scroll-list {
+        max-height: 420px;
+        overflow-y: auto;
+        padding-right: 0.25rem;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
         <h1>@Model.EventName beheren</h1>
         <p class="text-muted mb-0">
@@ -19,6 +37,23 @@
        asp-action="Index">
         Terug naar evenementen
     </a>
+    <a class="btn btn-primary ms-2"
+       asp-controller="SportEvent"
+       asp-action="Edit"
+       asp-route-id="@Model.EventId">
+        Evenement bewerken
+    </a>
+    <form asp-controller="SportEvent"
+          asp-action="Delete"
+          method="post"
+          class="ms-2"
+          onsubmit="return confirm('Weet u zeker dat u dit evenement wilt verwijderen?');">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.EventId" />
+        <button type="submit" class="btn btn-outline-danger">
+            Evenement verwijderen
+        </button>
+    </form>
 </div>
 
 @if (!string.IsNullOrWhiteSpace(Model.Description))
@@ -38,7 +73,7 @@
 
 <div class="row g-4">
     <div class="col-md-6 col-lg-3">
-        <div class="card h-100">
+        <div class="card h-100 manage-overview-card">
             <div class="card-body">
                 <h2 class="h5">Activiteiten</h2>
                 <p>Voeg activiteiten toe voor dit evenement.</p>
@@ -54,12 +89,31 @@
                 }
                 else
                 {
-                    <ul class="mt-3 mb-0 ps-3">
+                    <ul class="mt-3 mb-0 ps-3 manage-scroll-list">
                         @foreach (var activity in Model.Activities)
                         {
                             <li>
                                 <strong>@activity.ActivityName</strong>
                                 (@activity.ActivityType, max. @activity.MaxParticipants)
+                                <div class="mt-1">
+                                    <a asp-controller="Activity"
+                                       asp-action="Edit"
+                                       asp-route-id="@activity.ActivityId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Bewerken
+                                    </a>
+                                    <form asp-controller="Activity"
+                                          asp-action="Delete"
+                                          method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Deze activiteit verwijderen?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@activity.ActivityId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            Verwijderen
+                                        </button>
+                                    </form>
+                                </div>
                             </li>
                         }
                     </ul>
@@ -71,7 +125,7 @@
     </div>
 
     <div class="col-md-6 col-lg-3">
-        <div class="card h-100">
+        <div class="card h-100 manage-overview-card">
             <div class="card-body">
                 <h2 class="h5">Tijdsloten</h2>
                 <p>Voeg tijdsloten toe voor dit evenement.</p>
@@ -81,12 +135,51 @@
                    asp-route-eventId="@Model.EventId">
                     Tijdslot toevoegen
                 </a>
+                @if (Model.TimeSlots.Count == 0)
+                {
+                    <p class="text-muted mt-3 mb-0">Nog geen tijdsloten voor dit evenement.</p>
+                }
+                else
+                {
+                    <p class="small text-muted mt-2 mb-1">
+                        @Model.TimeSlots.Count tijdsloten
+                    </p>
+                    <ul class="mt-1 mb-0 ps-3 manage-scroll-list">
+                        @foreach (var timeSlot in Model.TimeSlots)
+                        {
+                            <li>
+                                @timeSlot.SlotDate.ToString("dd-MM-yyyy")
+                                @timeSlot.StartTime.ToString("HH:mm") -
+                                @timeSlot.EndTime.ToString("HH:mm")
+                                <div class="mt-1">
+                                    <a asp-controller="TimeSlot"
+                                       asp-action="Edit"
+                                       asp-route-id="@timeSlot.TimeSlotId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Bewerken
+                                    </a>
+                                    <form asp-controller="TimeSlot"
+                                          asp-action="Delete"
+                                          method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Dit tijdslot verwijderen?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@timeSlot.TimeSlotId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            Verwijderen
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
             </div>
         </div>
     </div>
 
     <div class="col-md-6 col-lg-3">
-        <div class="card h-100">
+        <div class="card h-100 manage-overview-card">
             <div class="card-body">
                 <h2 class="h5">Locaties</h2>
                 <p>Voeg locaties toe die in planningen gebruikt kunnen worden.</p>
@@ -102,12 +195,31 @@
                 }
                 else
                 {
-                    <ul class="mt-3 mb-0 ps-3">
+                    <ul class="mt-3 mb-0 ps-3 manage-scroll-list">
                         @foreach (var location in Model.Locations)
                         {
                             <li>
                                 <strong>@location.Name</strong>
                                 (@location.LocationType, max. @location.Capacity)
+                                <div class="mt-1">
+                                    <a asp-controller="Location"
+                                       asp-action="Edit"
+                                       asp-route-id="@location.LocationId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Bewerken
+                                    </a>
+                                    <form asp-controller="Location"
+                                          asp-action="Delete"
+                                          method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Deze locatie verwijderen?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@location.LocationId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            Verwijderen
+                                        </button>
+                                    </form>
+                                </div>
                             </li>
                         }
                     </ul>
@@ -169,10 +281,8 @@
                                 <div class="col-md-6 col-lg-3">
                                     <label asp-for="ActivityRows[index].ExecutionType" class="form-label"></label>
                                     <select asp-for="ActivityRows[index].ExecutionType"
+                                            asp-items="ExecutionTypes.All.Select(type => new SelectListItem(type, type))"
                                             class="form-select">
-                                        <option value="Individueel">Individueel</option>
-                                        <option value="Team">Team</option>
-                                        <option value="Toernooi">Toernooi</option>
                                     </select>
                                 </div>
 
@@ -188,14 +298,6 @@
                                             </option>
                                         }
                                     </select>
-                                </div>
-
-                                <div class="col-md-6 col-lg-2">
-                                    <label asp-for="ActivityRows[index].MaxParticipants" class="form-label"></label>
-                                    <input asp-for="ActivityRows[index].MaxParticipants"
-                                           type="number"
-                                           min="1"
-                                           class="form-control" />
                                 </div>
 
                                 <div class="col-md-6 col-lg-1">

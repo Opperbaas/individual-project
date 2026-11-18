@@ -4,6 +4,7 @@ namespace PresentationLayer.Models;
 
 public sealed class CreateTimeSlotViewModel
 {
+    public int TimeSlotId { get; set; }
     public int EventId { get; set; }
 
     [Required]

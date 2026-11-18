@@ -1,0 +1,45 @@
+@model PresentationLayer.Models.CreateLocationViewModel
+@using BusinessLayer.Enums
+
+@{
+    ViewData["Title"] = "Locatie bewerken";
+}
+
+<h1>Locatie bewerken</h1>
+
+<form asp-controller="Location" asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="LocationId" type="hidden" />
+    <input asp-for="EventId" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LocationType" class="form-label"></label>
+        <select asp-for="LocationType" class="form-select">
+            @foreach (var locationType in LocationTypes.All)
+            {
+                <option value="@locationType">@locationType</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Capacity" class="form-label"></label>
+        <input asp-for="Capacity" type="number" min="1" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Wijzigingen opslaan</button>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+        Annuleren
+    </a>
+</form>

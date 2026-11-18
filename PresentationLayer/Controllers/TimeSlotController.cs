@@ -111,4 +111,77 @@ public sealed class TimeSlotController : Controller
             return View("~/Views/TimeSlot/Generate.cshtml", model);
         }
     }
+
+    [HttpGet]
+    [Authorize(Roles = RoleNames.Organizer)]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var timeSlot = await _timeSlotService.GetByIdAsync(id);
+        if (timeSlot is null)
+        {
+            return NotFound();
+        }
+
+        return View("~/Views/TimeSlot/Edit.cshtml",
+            new CreateTimeSlotViewModel
+            {
+                TimeSlotId = timeSlot.TimeSlotId,
+                EventId = timeSlot.EventId,
+                SlotDate = timeSlot.SlotDate,
+                StartTime = timeSlot.StartTime,
+                EndTime = timeSlot.EndTime
+            });
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RoleNames.Organizer)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(CreateTimeSlotViewModel model)
+    {
+        try
+        {
+            await _timeSlotService.UpdateAsync(
+                model.TimeSlotId,
+                model.EventId,
+                model.SlotDate,
+                model.StartTime,
+                model.EndTime);
+            return RedirectToAction(
+                "Manage",
+                "SportEvent",
+                new { id = model.EventId });
+        }
+        catch (ArgumentException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            return View("~/Views/TimeSlot/Edit.cshtml", model);
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RoleNames.Organizer)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var timeSlot = await _timeSlotService.GetByIdAsync(id);
+        if (timeSlot is null)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            await _timeSlotService.DeleteAsync(id);
+            TempData["SuccessMessage"] = "Het tijdslot is verwijderd.";
+        }
+        catch (InvalidOperationException exception)
+        {
+            TempData["SuccessMessage"] = exception.Message;
+        }
+
+        return RedirectToAction(
+            "Manage",
+            "SportEvent",
+            new { id = timeSlot.EventId });
+    }
 }

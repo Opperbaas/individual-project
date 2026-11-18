@@ -4,6 +4,7 @@ namespace PresentationLayer.Models;
 
 public sealed class CreateLocationViewModel
 {
+    public int LocationId { get; set; }
     public int EventId { get; set; }
 
     [Required]

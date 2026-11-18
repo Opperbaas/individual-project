@@ -4,6 +4,7 @@ namespace PresentationLayer.Models;
 
 public sealed class CreateActivityViewModel
 {
+    public int ActivityId { get; set; }
     public int EventId { get; set; }
 
     [Required]

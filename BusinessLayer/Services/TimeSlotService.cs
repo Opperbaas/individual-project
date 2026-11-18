@@ -118,6 +118,59 @@ public sealed class TimeSlotService : ITimeSlotService
         return await _timeSlotRepository.CreateManyAsync(generatedSlots);
     }
 
+    public Task<TimeSlot?> GetByIdAsync(int timeSlotId)
+    {
+        if (timeSlotId <= 0)
+        {
+            throw new ArgumentException("Het tijdslot is ongeldig.");
+        }
+
+        return _timeSlotRepository.GetByIdAsync(timeSlotId);
+    }
+
+    public Task UpdateAsync(
+        int timeSlotId,
+        int eventId,
+        DateOnly slotDate,
+        TimeOnly startTime,
+        TimeOnly endTime)
+    {
+        if (timeSlotId <= 0)
+        {
+            throw new ArgumentException("Het tijdslot is ongeldig.");
+        }
+
+        if (eventId <= 0)
+        {
+            throw new ArgumentException("Het sportevenement is ongeldig.");
+        }
+
+        if (startTime >= endTime)
+        {
+            throw new ArgumentException(
+                "De begintijd moet vóór de eindtijd liggen.");
+        }
+
+        return _timeSlotRepository.UpdateAsync(new TimeSlot
+        {
+            TimeSlotId = timeSlotId,
+            EventId = eventId,
+            SlotDate = slotDate,
+            StartTime = startTime,
+            EndTime = endTime
+        });
+    }
+
+    public Task DeleteAsync(int timeSlotId)
+    {
+        if (timeSlotId <= 0)
+        {
+            throw new ArgumentException("Het tijdslot is ongeldig.");
+        }
+
+        return _timeSlotRepository.DeleteAsync(timeSlotId);
+    }
+
     private static (
         DateOnly Date,
         TimeOnly StartTime,
