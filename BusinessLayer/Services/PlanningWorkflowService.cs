@@ -8,13 +8,36 @@ public sealed class PlanningWorkflowService : IPlanningWorkflowService
 {
     private readonly IPlanningService _planningService;
     private readonly IVolunteerAssignmentService _volunteerAssignmentService;
+    private readonly IPlanningGenerator _planningGenerator;
 
     public PlanningWorkflowService(
         IPlanningService planningService,
-        IVolunteerAssignmentService volunteerAssignmentService)
+        IVolunteerAssignmentService volunteerAssignmentService,
+        IPlanningGenerator planningGenerator)
     {
         _planningService = planningService;
         _volunteerAssignmentService = volunteerAssignmentService;
+        _planningGenerator = planningGenerator;
+    }
+
+    public async Task<Planning> GenerateWithAiAsync(
+        int eventId,
+        int createdByUserId,
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        var planning = new Planning
+        {
+            EventId = eventId,
+            CreatedByUserId = createdByUserId,
+            Name = name
+        };
+
+        planning = await _planningGenerator.GenerateAsync(
+            planning,
+            cancellationToken);
+
+        return await _planningService.CreateAsync(planning);
     }
 
     public async Task<Planning> CreateAsync(CreatePlanningRequest request)

@@ -11,14 +11,37 @@
     </div>
     @if (User.IsInRole("Organizer"))
     {
-        <a class="btn btn-primary"
-           asp-controller="Planning"
-           asp-action="Create"
-           asp-route-eventId="@Context.Request.Query["eventId"]">
-            Planning aanmaken
-        </a>
+        <div class="d-flex gap-2">
+            <a class="btn btn-primary"
+               asp-controller="Planning"
+               asp-action="Create"
+               asp-route-eventId="@Context.Request.Query["eventId"]">
+                Planning aanmaken
+            </a>
+            <form asp-controller="Planning"
+                  asp-action="GenerateWithAi"
+                  method="post"
+                  class="d-flex gap-2">
+                @Html.AntiForgeryToken()
+                <input type="hidden"
+                       name="eventId"
+                       value="@Context.Request.Query["eventId"]" />
+                <input class="form-control"
+                       name="name"
+                       value="AI-planning"
+                       aria-label="Naam van de AI-planning" />
+                <button type="submit" class="btn btn-outline-primary">
+                    Genereer met AI
+                </button>
+            </form>
+        </div>
     }
 </div>
+
+@if (TempData["PlanningError"] is string planningError)
+{
+    <div class="alert alert-danger">@planningError</div>
+}
 
 @if (Model.Count == 0)
 {

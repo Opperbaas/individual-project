@@ -32,6 +32,17 @@ builder.Services.AddScoped<IPlanningService, PlanningService>();
 builder.Services.AddScoped<
     IPlanningWorkflowService,
     PlanningWorkflowService>();
+builder.Services.AddSingleton(new OpenAiSettings
+{
+    ApiKey = builder.Configuration["OpenAI:ApiKey"] ?? "",
+    Model = builder.Configuration["OpenAI:Model"] ?? "gpt-4o-mini"
+});
+builder.Services.AddHttpClient<OpenAiPlanningGenerator>(client =>
+{
+    client.BaseAddress = new Uri("https://api.openai.com/v1/");
+});
+builder.Services.AddScoped<IPlanningGenerator>(
+    services => services.GetRequiredService<OpenAiPlanningGenerator>());
 builder.Services.AddScoped<ISportEventService, SportEventService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<ILocationService, LocationService>();

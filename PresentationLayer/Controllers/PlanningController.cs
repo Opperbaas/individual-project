@@ -134,6 +134,43 @@ public sealed class PlanningController : Controller
         }
     }
 
+    [HttpPost]
+    [Authorize(Roles = RoleNames.Organizer)]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GenerateWithAi(
+        int eventId,
+        string name,
+        CancellationToken cancellationToken)
+    {
+        if (eventId <= 0)
+        {
+            return BadRequest();
+        }
+
+        if (!int.TryParse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier),
+                out var userId))
+        {
+            return Forbid();
+        }
+
+        try
+        {
+            var planning = await _planningWorkflowService.GenerateWithAiAsync(
+                eventId,
+                userId,
+                string.IsNullOrWhiteSpace(name) ? "AI-planning" : name,
+                cancellationToken);
+
+            return RedirectToAction(nameof(Details), new { id = planning.PlanningId });
+        }
+        catch (InvalidOperationException exception)
+        {
+            TempData["PlanningError"] = exception.Message;
+            return RedirectToAction(nameof(Index), new { eventId });
+        }
+    }
+
     [HttpGet]
     [Authorize(Roles = RoleNames.Organizer)]
     public async Task<IActionResult> Edit(int id)
