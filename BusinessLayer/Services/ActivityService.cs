@@ -1,4 +1,5 @@
 using BusinessLayer.Entities;
+using BusinessLayer.Enums;
 using BusinessLayer.Interfaces;
 
 namespace BusinessLayer.Services;
@@ -54,4 +55,70 @@ public sealed class ActivityService : IActivityService
             MaxParticipants = maxParticipants
         });
     }
+
+    public async Task<IReadOnlyList<Activity>> GenerateAsync(
+        int eventId,
+        string executionType,
+        string locationType,
+        string locationName,
+        int locationCapacity,
+        int maxParticipants,
+        int count)
+    {
+        if (eventId <= 0)
+        {
+            throw new ArgumentException(
+                "Het sportevenement is ongeldig.",
+                nameof(eventId));
+        }
+
+        if (!LocationTypes.All.Contains(locationType,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException(
+                "Kies een geldig locatietype.",
+                nameof(locationType));
+        }
+
+        if (string.IsNullOrWhiteSpace(executionType))
+        {
+            throw new ArgumentException(
+                "Kies een uitvoeringsvorm.",
+                nameof(executionType));
+        }
+
+        if (count <= 0 || count > 20)
+        {
+            throw new ArgumentException(
+                "Het aantal activiteiten moet tussen 1 en 20 liggen.",
+                nameof(count));
+        }
+
+        if (maxParticipants <= 0 ||
+            maxParticipants > locationCapacity)
+        {
+            throw new ArgumentException(
+                "Het maximum aantal deelnemers past niet bij de capaciteit van de gekozen locatie.",
+                nameof(maxParticipants));
+        }
+
+        var activities = new List<Activity>();
+        for (var index = 1; index <= count; index++)
+        {
+            var suffix = count == 1 ? "" : $" {index}";
+            var activity = await _activityRepository.CreateAsync(new Activity
+            {
+                EventId = eventId,
+                ActivityName = $"{executionType} activiteit - {locationType}{suffix}",
+                ActivityType = locationType.Trim(),
+                Description =
+                    $"{executionType}-activiteit op locatie {locationName} ({locationType}).",
+                MaxParticipants = maxParticipants
+            });
+            activities.Add(activity);
+        }
+
+        return activities;
+    }
+
 }

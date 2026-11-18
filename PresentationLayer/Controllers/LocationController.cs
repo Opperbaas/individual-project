@@ -18,9 +18,10 @@ public sealed class LocationController : Controller
 
     [HttpGet]
     [Authorize(Roles = RoleNames.Organizer)]
-    public IActionResult Create()
+    public IActionResult Create(int eventId = 0)
     {
-        return View("~/Views/Location/Create.cshtml");
+        return View("~/Views/Location/Create.cshtml",
+            new CreateLocationViewModel { EventId = eventId });
     }
 
     [HttpPost]
@@ -42,6 +43,15 @@ public sealed class LocationController : Controller
                 model.Description);
 
             TempData["SuccessMessage"] = "De locatie is toegevoegd.";
+
+            if (model.EventId > 0)
+            {
+                return RedirectToAction(
+                    "Manage",
+                    "SportEvent",
+                    new { id = model.EventId });
+            }
+
             return RedirectToAction("Index", "Home");
         }
         catch (ArgumentException exception)

@@ -10,4 +10,13 @@ public interface IActivityService
         string activityType,
         string description,
         int maxParticipants);
+
+    Task<IReadOnlyList<Activity>> GenerateAsync(
+        int eventId,
+        string executionType,
+        string locationType,
+        string locationName,
+        int locationCapacity,
+        int maxParticipants,
+        int count);
 }

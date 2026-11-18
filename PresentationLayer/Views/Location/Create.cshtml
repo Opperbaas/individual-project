@@ -1,4 +1,5 @@
 @model PresentationLayer.Models.CreateLocationViewModel
+@using BusinessLayer.Enums
 
 @{
     ViewData["Title"] = "Locatie toevoegen";
@@ -8,6 +9,7 @@
 
 <form asp-controller="Location" asp-action="Create" method="post">
     @Html.AntiForgeryToken()
+    <input asp-for="EventId" type="hidden" />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="mb-3">
@@ -18,7 +20,12 @@
 
     <div class="mb-3">
         <label asp-for="LocationType" class="form-label"></label>
-        <input asp-for="LocationType" class="form-control" />
+        <select asp-for="LocationType" class="form-select">
+            @foreach (var locationType in LocationTypes.All)
+            {
+                <option value="@locationType">@locationType</option>
+            }
+        </select>
         <span asp-validation-for="LocationType" class="text-danger"></span>
     </div>
 
@@ -35,7 +42,10 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Locatie toevoegen</button>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+    <a asp-controller="@(Model.EventId > 0 ? "SportEvent" : "Home")"
+       asp-action="@(Model.EventId > 0 ? "Manage" : "Index")"
+       asp-route-id="@(Model.EventId > 0 ? Model.EventId : null)"
+       class="btn btn-outline-secondary">
         Annuleren
     </a>
 </form>

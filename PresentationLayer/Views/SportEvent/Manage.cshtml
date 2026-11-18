@@ -1,4 +1,6 @@
-@model PresentationLayer.Models.SportEventViewModel
+@model PresentationLayer.Models.ManageSportEventViewModel
+@using BusinessLayer.Enums
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
     ViewData["Title"] = "Evenement beheren";
@@ -24,6 +26,16 @@
     <p>@Model.Description</p>
 }
 
+@if (TempData["EventManageSuccess"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+@if (TempData["EventManageError"] is string errorMessage)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
 <div class="row g-4">
     <div class="col-md-6 col-lg-3">
         <div class="card h-100">
@@ -36,8 +48,26 @@
                    asp-route-eventId="@Model.EventId">
                     Activiteit toevoegen
                 </a>
+                @if (Model.Activities.Count == 0)
+                {
+                    <p class="text-muted mt-3 mb-0">Nog geen activiteiten voor dit evenement.</p>
+                }
+                else
+                {
+                    <ul class="mt-3 mb-0 ps-3">
+                        @foreach (var activity in Model.Activities)
+                        {
+                            <li>
+                                <strong>@activity.ActivityName</strong>
+                                (@activity.ActivityType, max. @activity.MaxParticipants)
+                            </li>
+                        }
+                    </ul>
+                }
             </div>
         </div>
+
+
     </div>
 
     <div class="col-md-6 col-lg-3">
@@ -62,9 +92,26 @@
                 <p>Voeg locaties toe die in planningen gebruikt kunnen worden.</p>
                 <a class="btn btn-primary"
                    asp-controller="Location"
-                   asp-action="Create">
+                   asp-action="Create"
+                   asp-route-eventId="@Model.EventId">
                     Locatie toevoegen
                 </a>
+                @if (Model.Locations.Count == 0)
+                {
+                    <p class="text-muted mt-3 mb-0">Nog geen locaties beschikbaar.</p>
+                }
+                else
+                {
+                    <ul class="mt-3 mb-0 ps-3">
+                        @foreach (var location in Model.Locations)
+                        {
+                            <li>
+                                <strong>@location.Name</strong>
+                                (@location.LocationType, max. @location.Capacity)
+                            </li>
+                        }
+                    </ul>
+                }
             </div>
         </div>
     </div>
@@ -84,3 +131,164 @@
         </div>
     </div>
 </div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <h2 class="h4">Activiteiten genereren</h2>
+        <p class="text-muted">
+            Voeg meerdere rijen toe om in één keer verschillende activiteiten te genereren.
+        </p>
+
+        @if (Model.Locations.Count == 0)
+        {
+            <div class="alert alert-warning">
+                Voeg eerst een locatie toe voordat je activiteiten genereert.
+            </div>
+        }
+        else
+        {
+            <form asp-controller="SportEvent"
+                  asp-action="GenerateActivities"
+                  method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="EventId" type="hidden" />
+
+                <div id="activityRows">
+                    @for (var index = 0; index < Model.ActivityRows.Count; index++)
+                    {
+                        <div class="activity-row border rounded p-3 mb-3">
+                            <div class="row g-3">
+                                <div class="col-md-6 col-lg-3">
+                                    <label asp-for="ActivityRows[index].LocationType" class="form-label"></label>
+                                    <select asp-for="ActivityRows[index].LocationType"
+                                            asp-items="LocationTypes.All.Select(type => new SelectListItem(type, type))"
+                                            class="form-select row-location-type">
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 col-lg-3">
+                                    <label asp-for="ActivityRows[index].ExecutionType" class="form-label"></label>
+                                    <select asp-for="ActivityRows[index].ExecutionType"
+                                            class="form-select">
+                                        <option value="Individueel">Individueel</option>
+                                        <option value="Team">Team</option>
+                                        <option value="Toernooi">Toernooi</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 col-lg-3">
+                                    <label asp-for="ActivityRows[index].LocationId" class="form-label">Locatie</label>
+                                    <select asp-for="ActivityRows[index].LocationId"
+                                            class="form-select row-location">
+                                        @foreach (var location in Model.Locations)
+                                        {
+                                            <option value="@location.LocationId"
+                                                    data-location-type="@location.LocationType">
+                                                @location.Name (@location.LocationType)
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 col-lg-2">
+                                    <label asp-for="ActivityRows[index].MaxParticipants" class="form-label"></label>
+                                    <input asp-for="ActivityRows[index].MaxParticipants"
+                                           type="number"
+                                           min="1"
+                                           class="form-control" />
+                                </div>
+
+                                <div class="col-md-6 col-lg-1">
+                                    <label asp-for="ActivityRows[index].Count" class="form-label">Aantal</label>
+                                    <input asp-for="ActivityRows[index].Count"
+                                           type="number"
+                                           min="1"
+                                           max="20"
+                                           class="form-control" />
+                                </div>
+                            </div>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger mt-3 remove-row">
+                                Rij verwijderen
+                            </button>
+                        </div>
+                    }
+                </div>
+
+                <button type="button"
+                        id="addActivityRow"
+                        class="btn btn-outline-primary">
+                    Nog een rij toevoegen
+                </button>
+                <button type="submit" class="btn btn-primary ms-2">
+                    Activiteiten genereren
+                </button>
+            </form>
+        }
+    </div>
+</div>
+
+<script>
+    const activityRows = document.getElementById("activityRows");
+    const addActivityRow = document.getElementById("addActivityRow");
+
+    function reindexActivityRows() {
+        const rows = activityRows?.querySelectorAll(".activity-row") ?? [];
+        rows.forEach((row, index) => {
+            row.querySelectorAll("[name]").forEach(field => {
+                field.name = field.name.replace(
+                    /ActivityRows\[\d+\]/,
+                    `ActivityRows[${index}]`);
+            });
+            row.querySelectorAll("[id]").forEach(field => {
+                field.id = field.id.replace(/_\d+__/,
+                    `_${index}__`);
+            });
+        });
+    }
+
+    function filterRowLocations(row) {
+        const typeSelect = row.querySelector(".row-location-type");
+        const locationSelect = row.querySelector(".row-location");
+        if (!typeSelect || !locationSelect) return;
+
+        let firstVisible = null;
+        for (const option of locationSelect.options) {
+            const matches = option.dataset.locationType === typeSelect.value;
+            option.hidden = !matches;
+            if (matches && firstVisible === null) firstVisible = option;
+        }
+
+        if (firstVisible !== null &&
+            (locationSelect.selectedOptions.length === 0 ||
+             locationSelect.selectedOptions[0].hidden)) {
+            locationSelect.value = firstVisible.value;
+        }
+    }
+
+    function attachRowEvents(row) {
+        const typeSelect = row.querySelector(".row-location-type");
+        typeSelect?.addEventListener("change", () => filterRowLocations(row));
+        row.querySelector(".remove-row")?.addEventListener("click", () => {
+            const rows = activityRows.querySelectorAll(".activity-row");
+            if (rows.length > 1) {
+                row.remove();
+                reindexActivityRows();
+            }
+        });
+        filterRowLocations(row);
+    }
+
+    activityRows?.querySelectorAll(".activity-row").forEach(attachRowEvents);
+
+    addActivityRow?.addEventListener("click", () => {
+        const firstRow = activityRows.querySelector(".activity-row");
+        if (!firstRow) return;
+
+        const newRow = firstRow.cloneNode(true);
+        activityRows.appendChild(newRow);
+        reindexActivityRows();
+        attachRowEvents(newRow);
+    });
+</script>

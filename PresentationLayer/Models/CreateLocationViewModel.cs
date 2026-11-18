@@ -4,6 +4,8 @@ namespace PresentationLayer.Models;
 
 public sealed class CreateLocationViewModel
 {
+    public int EventId { get; set; }
+
     [Required]
     [StringLength(200)]
     [Display(Name = "Naam")]
