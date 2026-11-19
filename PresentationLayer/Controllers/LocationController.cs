@@ -87,6 +87,11 @@ public sealed class LocationController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(CreateLocationViewModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("~/Views/Location/Edit.cshtml", model);
+        }
+
         try
         {
             await _locationService.UpdateAsync(
@@ -118,7 +123,7 @@ public sealed class LocationController : Controller
         }
         catch (InvalidOperationException exception)
         {
-            TempData["SuccessMessage"] = exception.Message;
+            TempData["ErrorMessage"] = exception.Message;
             return RedirectToAction("Index", "Home");
         }
     }

@@ -87,6 +87,11 @@ public sealed class ActivityController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(CreateActivityViewModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("~/Views/Activity/Edit.cshtml", model);
+        }
+
         try
         {
             await _activityService.UpdateAsync(
@@ -122,7 +127,7 @@ public sealed class ActivityController : Controller
         try
         {
             await _activityService.DeleteAsync(id);
-            TempData["EventManageSuccess"] = "De activiteit is verwijderd.";
+            TempData["SuccessMessage"] = "De activiteit is verwijderd.";
             return RedirectToAction(
                 "Manage",
                 "SportEvent",
@@ -130,7 +135,7 @@ public sealed class ActivityController : Controller
         }
         catch (InvalidOperationException exception)
         {
-            TempData["EventManageError"] = exception.Message;
+            TempData["ErrorMessage"] = exception.Message;
             return RedirectToAction(
                 "Manage",
                 "SportEvent",

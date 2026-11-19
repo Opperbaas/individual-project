@@ -7,20 +7,46 @@ namespace BusinessLayer.Services;
 public sealed class PlanningWorkflowService : IPlanningWorkflowService
 {
     private readonly IPlanningService _planningService;
-    private readonly IVolunteerAssignmentService _volunteerAssignmentService;
-    private readonly IPlanningGenerator _planningGenerator;
+    private readonly ManualPlanner _manualPlanner;
+    private readonly IPlanningGenerator _optimizedPlanner;
+    private readonly IPlanningGenerator _openAiPlanningGenerator;
     private readonly ISportEventService _sportEventService;
 
     public PlanningWorkflowService(
         IPlanningService planningService,
-        IVolunteerAssignmentService volunteerAssignmentService,
-        IPlanningGenerator planningGenerator,
+        ManualPlanner manualPlanner,
+        OptimizedPlanner optimizedPlanner,
+        OpenAiPlanningGenerator openAiPlanningGenerator,
         ISportEventService sportEventService)
     {
         _planningService = planningService;
-        _volunteerAssignmentService = volunteerAssignmentService;
-        _planningGenerator = planningGenerator;
+        _manualPlanner = manualPlanner;
+        _optimizedPlanner = optimizedPlanner;
+        _openAiPlanningGenerator = openAiPlanningGenerator;
         _sportEventService = sportEventService;
+    }
+
+    public Task<Planning> CreateAsync(CreatePlanningRequest request)
+    {
+        return _manualPlanner.CreateAsync(request);
+    }
+
+    public async Task<Planning> GenerateOptimizedAsync(
+        int eventId,
+        int createdByUserId,
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        var planning = await CreateGeneratedPlanningAsync(
+            eventId,
+            createdByUserId,
+            name);
+
+        planning = await _optimizedPlanner.GenerateAsync(
+            planning,
+            cancellationToken);
+
+        return await _planningService.CreateAsync(planning);
     }
 
     public async Task<Planning> GenerateWithAiAsync(
@@ -29,6 +55,23 @@ public sealed class PlanningWorkflowService : IPlanningWorkflowService
         string name,
         CancellationToken cancellationToken = default)
     {
+        var planning = await CreateGeneratedPlanningAsync(
+            eventId,
+            createdByUserId,
+            name);
+
+        planning = await _openAiPlanningGenerator.GenerateAsync(
+            planning,
+            cancellationToken);
+
+        return await _planningService.CreateAsync(planning);
+    }
+
+    private async Task<Planning> CreateGeneratedPlanningAsync(
+        int eventId,
+        int createdByUserId,
+        string name)
+    {
         var sportEvent = await _sportEventService.GetByIdAsync(eventId);
         if (sportEvent is null)
         {
@@ -36,79 +79,12 @@ public sealed class PlanningWorkflowService : IPlanningWorkflowService
                 "Het evenement waarvoor een planning wordt gegenereerd bestaat niet.");
         }
 
-        var planning = new Planning
+        return new Planning
         {
             EventId = eventId,
             CreatedByUserId = createdByUserId,
             Name = name,
             Event = sportEvent
         };
-
-        planning = await _planningGenerator.GenerateAsync(
-            planning,
-            cancellationToken);
-
-        return await _planningService.CreateAsync(planning);
-    }
-
-    public async Task<Planning> CreateAsync(CreatePlanningRequest request)
-    {
-        ArgumentNullException.ThrowIfNull(request);
-
-        var activities =
-            await _planningService.GetActivitiesByEventIdAsync(request.EventId);
-        var locations = await _planningService.GetLocationsAsync();
-        var timeSlots =
-            await _planningService.GetTimeSlotsByEventIdAsync(request.EventId);
-
-        var planning = new Planning
-        {
-            EventId = request.EventId,
-            CreatedByUserId = request.CreatedByUserId,
-            Name = request.Name
-        };
-
-        foreach (var scheduleRequest in request.Schedules)
-        {
-            var activity = activities.SingleOrDefault(
-                item => item.ActivityId == scheduleRequest.ActivityId);
-            var location = locations.SingleOrDefault(
-                item => item.LocationId == scheduleRequest.LocationId);
-            var timeSlot = timeSlots.SingleOrDefault(
-                item => item.TimeSlotId == scheduleRequest.TimeSlotId);
-
-            if (activity is null || location is null || timeSlot is null)
-            {
-                throw new ArgumentException(
-                    "Kies een geldige activiteit, locatie en tijdslot.");
-            }
-
-            planning.ActivitySchedules.Add(new ActivitySchedule
-            {
-                ActivityId = activity.ActivityId,
-                LocationId = location.LocationId,
-                TimeSlotId = timeSlot.TimeSlotId,
-                Activity = activity,
-                Location = location,
-                TimeSlot = timeSlot
-            });
-        }
-
-        planning = await _planningService.CreateAsync(planning);
-
-        var assignmentRequests = planning.ActivitySchedules
-            .Zip(request.Schedules, (activitySchedule, schedule) =>
-                new VolunteerAssignmentRequest
-                {
-                    ActivityScheduleId = activitySchedule.ActivityScheduleId,
-                    TimeSlotId = schedule.TimeSlotId,
-                    VolunteerIds = schedule.VolunteerIds
-                })
-            .ToList();
-
-        await _volunteerAssignmentService.ValidateAsync(assignmentRequests);
-        await _volunteerAssignmentService.AssignAsync(assignmentRequests);
-
-        return planning;
     }
 }

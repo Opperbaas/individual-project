@@ -33,18 +33,10 @@ public sealed class SportEventService : ISportEventService
         DateTime startDate,
         DateTime endDate)
     {
-        if (string.IsNullOrWhiteSpace(eventName))
-        {
-            throw new ArgumentException(
-                "Een sportevenement moet een naam hebben.",
-                nameof(eventName));
-        }
-
-        if (startDate > endDate)
-        {
-            throw new ArgumentException(
-                "De begindatum mag niet na de einddatum liggen.");
-        }
+        ValidateSportEvent(
+            eventName,
+            startDate,
+            endDate);
 
         return _sportEventRepository.CreateAsync(new SportEvent
         {
@@ -67,17 +59,10 @@ public sealed class SportEventService : ISportEventService
             throw new ArgumentException("Het sportevenement is ongeldig.");
         }
 
-        if (string.IsNullOrWhiteSpace(eventName))
-        {
-            throw new ArgumentException(
-                "Een sportevenement moet een naam hebben.");
-        }
-
-        if (startDate > endDate)
-        {
-            throw new ArgumentException(
-                "De begindatum mag niet na de einddatum liggen.");
-        }
+        ValidateSportEvent(
+            eventName,
+            startDate,
+            endDate);
 
         await _sportEventRepository.UpdateAsync(new SportEvent
         {
@@ -87,6 +72,25 @@ public sealed class SportEventService : ISportEventService
             StartDate = startDate,
             EndDate = endDate
         });
+    }
+
+    private static void ValidateSportEvent(
+        string eventName,
+        DateTime startDate,
+        DateTime endDate)
+    {
+        if (string.IsNullOrWhiteSpace(eventName))
+        {
+            throw new ArgumentException(
+                "Een sportevenement moet een naam hebben.",
+                nameof(eventName));
+        }
+
+        if (startDate > endDate)
+        {
+            throw new ArgumentException(
+                "De begindatum mag niet na de einddatum liggen.");
+        }
     }
 
     public Task DeleteAsync(int eventId)

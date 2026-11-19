@@ -138,6 +138,11 @@ public sealed class TimeSlotController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(CreateTimeSlotViewModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            return View("~/Views/TimeSlot/Edit.cshtml", model);
+        }
+
         try
         {
             await _timeSlotService.UpdateAsync(
@@ -176,7 +181,7 @@ public sealed class TimeSlotController : Controller
         }
         catch (InvalidOperationException exception)
         {
-            TempData["SuccessMessage"] = exception.Message;
+            TempData["ErrorMessage"] = exception.Message;
         }
 
         return RedirectToAction(

@@ -71,16 +71,7 @@ public sealed class SportEventController : Controller
             EndDate = sportEvent.EndDate,
             Activities = activities,
             Locations = locations,
-            TimeSlots = timeSlots,
-            ActivityRows =
-            [
-                new GenerateActivityRowViewModel
-                {
-                    LocationId = locations.Count > 0
-                        ? locations[0].LocationId
-                        : 0
-                }
-            ]
+            TimeSlots = timeSlots
         };
 
         return View("~/Views/SportEvent/Manage.cshtml", model);
@@ -90,17 +81,17 @@ public sealed class SportEventController : Controller
     [Authorize(Roles = RoleNames.Organizer)]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> GenerateActivities(
-        ManageSportEventViewModel model)
+        GenerateActivitiesViewModel model)
     {
         if (model.EventId <= 0)
         {
-            TempData["EventManageError"] = "Een geldig evenement is vereist.";
+            TempData["ErrorMessage"] = "Een geldig evenement is vereist.";
             return RedirectToAction(nameof(Manage), new { id = model.EventId });
         }
 
         if (model.ActivityRows.Count == 0)
         {
-            TempData["EventManageError"] =
+            TempData["ErrorMessage"] =
                 "Voeg minimaal één rij toe om activiteiten te genereren.";
             return RedirectToAction(nameof(Manage), new { id = model.EventId });
         }
@@ -143,12 +134,12 @@ public sealed class SportEventController : Controller
                 generatedCount += activities.Count;
             }
 
-            TempData["EventManageSuccess"] =
+            TempData["SuccessMessage"] =
                 $"{generatedCount} activiteit(en) gegenereerd.";
         }
         catch (ArgumentException exception)
         {
-            TempData["EventManageError"] = exception.Message;
+            TempData["ErrorMessage"] = exception.Message;
         }
 
         return RedirectToAction(nameof(Manage), new { id = model.EventId });
@@ -244,12 +235,12 @@ public sealed class SportEventController : Controller
         try
         {
             await _sportEventService.DeleteAsync(id);
-            TempData["EventManageSuccess"] = "Het evenement is verwijderd.";
+            TempData["SuccessMessage"] = "Het evenement is verwijderd.";
             return RedirectToAction(nameof(Index));
         }
         catch (InvalidOperationException exception)
         {
-            TempData["EventManageError"] = exception.Message;
+            TempData["ErrorMessage"] = exception.Message;
             return RedirectToAction(nameof(Manage), new { id });
         }
         catch (KeyNotFoundException)

@@ -29,6 +29,8 @@ builder.Services.AddScoped<IVolunteerAssignmentRepository,
     SqlVolunteerAssignmentRepository>();
 builder.Services.AddScoped<ScheduleValidationService>();
 builder.Services.AddScoped<IPlanningService, PlanningService>();
+builder.Services.AddScoped<ManualPlanner>();
+builder.Services.AddScoped<OptimizedPlanner>();
 builder.Services.AddScoped<
     IPlanningWorkflowService,
     PlanningWorkflowService>();
@@ -41,10 +43,9 @@ builder.Services.AddHttpClient<OpenAiPlanningGenerator>(client =>
 {
     client.BaseAddress = new Uri("https://api.openai.com/v1/");
 });
-builder.Services.AddScoped<IPlanningGenerator>(
-    services => services.GetRequiredService<OpenAiPlanningGenerator>());
 builder.Services.AddScoped<ISportEventService, SportEventService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
+builder.Services.AddScoped<IActivityTemplateService, ActivityTemplateService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();

@@ -137,6 +137,48 @@ public sealed class PlanningController : Controller
     [HttpPost]
     [Authorize(Roles = RoleNames.Organizer)]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GenerateOptimized(
+        int eventId,
+        string name,
+        CancellationToken cancellationToken)
+    {
+        if (eventId <= 0)
+        {
+            return BadRequest();
+        }
+
+        if (!int.TryParse(
+                User.FindFirstValue(ClaimTypes.NameIdentifier),
+                out var userId))
+        {
+            return Forbid();
+        }
+
+        try
+        {
+            var planning = await _planningWorkflowService.GenerateOptimizedAsync(
+                eventId,
+                userId,
+                string.IsNullOrWhiteSpace(name) ? "Geoptimaliseerde planning" : name,
+                cancellationToken);
+
+            return RedirectToAction(nameof(Details), new { id = planning.PlanningId });
+        }
+        catch (ArgumentException exception)
+        {
+            TempData["ErrorMessage"] = exception.Message;
+            return RedirectToAction(nameof(Index), new { eventId });
+        }
+        catch (InvalidOperationException exception)
+        {
+            TempData["ErrorMessage"] = exception.Message;
+            return RedirectToAction(nameof(Index), new { eventId });
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = RoleNames.Organizer)]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> GenerateWithAi(
         int eventId,
         string name,
@@ -166,12 +208,12 @@ public sealed class PlanningController : Controller
         }
         catch (ArgumentException exception)
         {
-            TempData["PlanningError"] = exception.Message;
+            TempData["ErrorMessage"] = exception.Message;
             return RedirectToAction(nameof(Index), new { eventId });
         }
         catch (InvalidOperationException exception)
         {
-            TempData["PlanningError"] = exception.Message;
+            TempData["ErrorMessage"] = exception.Message;
             return RedirectToAction(nameof(Index), new { eventId });
         }
     }

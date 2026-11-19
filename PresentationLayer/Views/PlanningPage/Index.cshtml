@@ -19,6 +19,22 @@
                 Planning aanmaken
             </a>
             <form asp-controller="Planning"
+                  asp-action="GenerateOptimized"
+                  method="post"
+                  class="d-flex gap-2">
+                @Html.AntiForgeryToken()
+                <input type="hidden"
+                       name="eventId"
+                       value="@Context.Request.Query["eventId"]" />
+                <input class="form-control"
+                       name="name"
+                       value="Geoptimaliseerde planning"
+                       aria-label="Naam van de geoptimaliseerde planning" />
+                <button type="submit" class="btn btn-outline-success">
+                    Optimaliseer planning
+                </button>
+            </form>
+            <form asp-controller="Planning"
                   asp-action="GenerateWithAi"
                   method="post"
                   class="d-flex gap-2">
@@ -38,7 +54,7 @@
     }
 </div>
 
-@if (TempData["PlanningError"] is string planningError)
+@if (TempData["ErrorMessage"] is string planningError)
 {
     <div class="alert alert-danger">@planningError</div>
 }

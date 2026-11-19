@@ -4,6 +4,17 @@
 
 @{
     ViewData["Title"] = "Evenement beheren";
+    var generationModel = new GenerateActivitiesViewModel
+    {
+        EventId = Model.EventId,
+        ActivityRows =
+        [
+            new GenerateActivityRowViewModel
+            {
+                LocationId = Model.Locations.FirstOrDefault()?.LocationId ?? 0
+            }
+        ]
+    };
 }
 
 <style>
@@ -61,12 +72,12 @@
     <p>@Model.Description</p>
 }
 
-@if (TempData["EventManageSuccess"] is string successMessage)
+@if (TempData["SuccessMessage"] is string successMessage)
 {
     <div class="alert alert-success">@successMessage</div>
 }
 
-@if (TempData["EventManageError"] is string errorMessage)
+@if (TempData["ErrorMessage"] is string errorMessage)
 {
     <div class="alert alert-danger">@errorMessage</div>
 }
@@ -263,32 +274,35 @@
                   asp-action="GenerateActivities"
                   method="post">
                 @Html.AntiForgeryToken()
-                <input asp-for="EventId" type="hidden" />
+                <input name="EventId" value="@generationModel.EventId" type="hidden" />
 
                 <div id="activityRows">
-                    @for (var index = 0; index < Model.ActivityRows.Count; index++)
+                    @for (var index = 0; index < generationModel.ActivityRows.Count; index++)
                     {
                         <div class="activity-row border rounded p-3 mb-3">
                             <div class="row g-3">
                                 <div class="col-md-6 col-lg-3">
-                                    <label asp-for="ActivityRows[index].LocationType" class="form-label"></label>
-                                    <select asp-for="ActivityRows[index].LocationType"
+                                    <label for="ActivityRows_@(index)__LocationType" class="form-label">Locatietype</label>
+                                    <select name="ActivityRows[@index].LocationType"
+                                            id="ActivityRows_@(index)__LocationType"
                                             asp-items="LocationTypes.All.Select(type => new SelectListItem(type, type))"
                                             class="form-select row-location-type">
                                     </select>
                                 </div>
 
                                 <div class="col-md-6 col-lg-3">
-                                    <label asp-for="ActivityRows[index].ExecutionType" class="form-label"></label>
-                                    <select asp-for="ActivityRows[index].ExecutionType"
+                                    <label for="ActivityRows_@(index)__ExecutionType" class="form-label">Uitvoeringsvorm</label>
+                                    <select name="ActivityRows[@index].ExecutionType"
+                                            id="ActivityRows_@(index)__ExecutionType"
                                             asp-items="ExecutionTypes.All.Select(type => new SelectListItem(type, type))"
                                             class="form-select">
                                     </select>
                                 </div>
 
                                 <div class="col-md-6 col-lg-3">
-                                    <label asp-for="ActivityRows[index].LocationId" class="form-label">Locatie</label>
-                                    <select asp-for="ActivityRows[index].LocationId"
+                                    <label for="ActivityRows_@(index)__LocationId" class="form-label">Locatie</label>
+                                    <select name="ActivityRows[@index].LocationId"
+                                            id="ActivityRows_@(index)__LocationId"
                                             class="form-select row-location">
                                         @foreach (var location in Model.Locations)
                                         {
@@ -301,8 +315,10 @@
                                 </div>
 
                                 <div class="col-md-6 col-lg-1">
-                                    <label asp-for="ActivityRows[index].Count" class="form-label">Aantal</label>
-                                    <input asp-for="ActivityRows[index].Count"
+                                    <label for="ActivityRows_@(index)__Count" class="form-label">Aantal</label>
+                                    <input name="ActivityRows[@index].Count"
+                                           id="ActivityRows_@(index)__Count"
+                                           value="@generationModel.ActivityRows[index].Count"
                                            type="number"
                                            min="1"
                                            max="20"
@@ -331,66 +347,6 @@
     </div>
 </div>
 
-<script>
-    const activityRows = document.getElementById("activityRows");
-    const addActivityRow = document.getElementById("addActivityRow");
-
-    function reindexActivityRows() {
-        const rows = activityRows?.querySelectorAll(".activity-row") ?? [];
-        rows.forEach((row, index) => {
-            row.querySelectorAll("[name]").forEach(field => {
-                field.name = field.name.replace(
-                    /ActivityRows\[\d+\]/,
-                    `ActivityRows[${index}]`);
-            });
-            row.querySelectorAll("[id]").forEach(field => {
-                field.id = field.id.replace(/_\d+__/,
-                    `_${index}__`);
-            });
-        });
-    }
-
-    function filterRowLocations(row) {
-        const typeSelect = row.querySelector(".row-location-type");
-        const locationSelect = row.querySelector(".row-location");
-        if (!typeSelect || !locationSelect) return;
-
-        let firstVisible = null;
-        for (const option of locationSelect.options) {
-            const matches = option.dataset.locationType === typeSelect.value;
-            option.hidden = !matches;
-            if (matches && firstVisible === null) firstVisible = option;
-        }
-
-        if (firstVisible !== null &&
-            (locationSelect.selectedOptions.length === 0 ||
-             locationSelect.selectedOptions[0].hidden)) {
-            locationSelect.value = firstVisible.value;
-        }
-    }
-
-    function attachRowEvents(row) {
-        const typeSelect = row.querySelector(".row-location-type");
-        typeSelect?.addEventListener("change", () => filterRowLocations(row));
-        row.querySelector(".remove-row")?.addEventListener("click", () => {
-            const rows = activityRows.querySelectorAll(".activity-row");
-            if (rows.length > 1) {
-                row.remove();
-                reindexActivityRows();
-            }
-        });
-        filterRowLocations(row);
-    }
-
-    activityRows?.querySelectorAll(".activity-row").forEach(attachRowEvents);
-
-    addActivityRow?.addEventListener("click", () => {
-        const firstRow = activityRows.querySelector(".activity-row");
-        if (!firstRow) return;
-
-        const newRow = firstRow.cloneNode(true);
-        activityRows.appendChild(newRow);
-        reindexActivityRows();
-        attachRowEvents(newRow);
-    });
-</script>
+@section Scripts {
+    <script src="~/js/manage-sport-event.js"></script>
+}

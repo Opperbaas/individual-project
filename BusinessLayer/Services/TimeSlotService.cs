@@ -19,16 +19,11 @@ public sealed class TimeSlotService : ITimeSlotService
         TimeOnly startTime,
         TimeOnly endTime)
     {
-        if (eventId <= 0)
-        {
-            throw new ArgumentException("Het sportevenement is ongeldig.", nameof(eventId));
-        }
-
-        if (startTime >= endTime)
-        {
-            throw new ArgumentException(
-                "De begintijd moet vóór de eindtijd liggen.");
-        }
+        ValidateTimeSlot(
+            eventId,
+            slotDate,
+            startTime,
+            endTime);
 
         return _timeSlotRepository.CreateAsync(new TimeSlot
         {
@@ -140,16 +135,11 @@ public sealed class TimeSlotService : ITimeSlotService
             throw new ArgumentException("Het tijdslot is ongeldig.");
         }
 
-        if (eventId <= 0)
-        {
-            throw new ArgumentException("Het sportevenement is ongeldig.");
-        }
-
-        if (startTime >= endTime)
-        {
-            throw new ArgumentException(
-                "De begintijd moet vóór de eindtijd liggen.");
-        }
+        ValidateTimeSlot(
+            eventId,
+            slotDate,
+            startTime,
+            endTime);
 
         return _timeSlotRepository.UpdateAsync(new TimeSlot
         {
@@ -159,6 +149,33 @@ public sealed class TimeSlotService : ITimeSlotService
             StartTime = startTime,
             EndTime = endTime
         });
+    }
+
+    private static void ValidateTimeSlot(
+        int eventId,
+        DateOnly slotDate,
+        TimeOnly startTime,
+        TimeOnly endTime)
+    {
+        if (eventId <= 0)
+        {
+            throw new ArgumentException(
+                "Het sportevenement is ongeldig.",
+                nameof(eventId));
+        }
+
+        if (slotDate == default)
+        {
+            throw new ArgumentException(
+                "Kies een geldige datum.",
+                nameof(slotDate));
+        }
+
+        if (startTime >= endTime)
+        {
+            throw new ArgumentException(
+                "De begintijd moet vóór de eindtijd liggen.");
+        }
     }
 
     public Task DeleteAsync(int timeSlotId)

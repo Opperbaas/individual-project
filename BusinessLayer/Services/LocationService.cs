@@ -1,3 +1,4 @@
+using BusinessLayer.Enums;
 using BusinessLayer.Entities;
 using BusinessLayer.Interfaces;
 
@@ -18,26 +19,7 @@ public sealed class LocationService : ILocationService
         int capacity,
         string description)
     {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException(
-                "Een locatie moet een naam hebben.",
-                nameof(name));
-        }
-
-        if (string.IsNullOrWhiteSpace(locationType))
-        {
-            throw new ArgumentException(
-                "Een locatie moet een type hebben.",
-                nameof(locationType));
-        }
-
-        if (capacity <= 0)
-        {
-            throw new ArgumentException(
-                "De capaciteit moet groter dan nul zijn.",
-                nameof(capacity));
-        }
+        ValidateLocation(name, locationType, capacity);
 
         return _locationRepository.CreateAsync(new Location
         {
@@ -75,13 +57,7 @@ public sealed class LocationService : ILocationService
             throw new ArgumentException("De locatie is ongeldig.");
         }
 
-        if (string.IsNullOrWhiteSpace(name) ||
-            string.IsNullOrWhiteSpace(locationType) ||
-            capacity <= 0)
-        {
-            throw new ArgumentException(
-                "Naam, locatietype en capaciteit zijn verplicht.");
-        }
+        ValidateLocation(name, locationType, capacity);
 
         return _locationRepository.UpdateAsync(new Location
         {
@@ -91,6 +67,35 @@ public sealed class LocationService : ILocationService
             Capacity = capacity,
             Description = description?.Trim() ?? ""
         });
+    }
+
+    private static void ValidateLocation(
+        string name,
+        string locationType,
+        int capacity)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(
+                "Een locatie moet een naam hebben.",
+                nameof(name));
+        }
+
+        if (!LocationTypes.All.Contains(
+                locationType,
+                StringComparer.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException(
+                "Kies een geldig locatietype.",
+                nameof(locationType));
+        }
+
+        if (capacity <= 0)
+        {
+            throw new ArgumentException(
+                "De capaciteit moet groter dan nul zijn.",
+                nameof(capacity));
+        }
     }
 
     public Task DeleteAsync(int locationId)
