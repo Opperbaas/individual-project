@@ -4,7 +4,7 @@ namespace BusinessLayer.Interfaces;
 
 public interface IRegistrationRepository
 {
-    Task<Activity?> GetActivityForRegistrationAsync(int activityId);
-    Task<bool> ExistsAsync(int userId, int activityId);
+    Task<ActivitySchedule?> GetActivityScheduleForRegistrationAsync(int activityScheduleId);
+    Task<bool> ExistsAsync(int userId, int activityScheduleId);
     Task<Registration> CreateAsync(Registration registration);
 }

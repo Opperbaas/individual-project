@@ -13,4 +13,6 @@ public sealed class ActivitySchedule
     public Planning Planning { get; set; } = null!;
     public ICollection<VolunteerAssignment> VolunteerAssignments { get; set; }
         = new List<VolunteerAssignment>();
+    public ICollection<Registration> Registrations { get; set; }
+        = new List<Registration>();
 }

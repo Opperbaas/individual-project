@@ -11,5 +11,4 @@ public sealed class Activity
     public string Description { get; set; } = "";
     public SportEvent Event { get; set; } = null!;
     public ICollection<ActivitySchedule> ActivitySchedules { get; set; } = new List<ActivitySchedule>();
-    public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
 }

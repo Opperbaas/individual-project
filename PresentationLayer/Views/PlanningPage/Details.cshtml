@@ -102,7 +102,7 @@ else
                             @schedule.TimeSlot.EndTime.ToString("HH:mm")
                         </td>
                         <td>
-                            @schedule.Activity.Registrations.Count /
+                            @schedule.Registrations.Count /
                             @schedule.Activity.MaxParticipants
                             @if (User.IsInRole(RoleNames.Participant))
                             {
@@ -111,8 +111,8 @@ else
                                       method="post"
                                       class="mt-2">
                                     @Html.AntiForgeryToken()
-                                    <input type="hidden" name="activityId"
-                                           value="@schedule.Activity.ActivityId" />
+                                    <input type="hidden" name="activityScheduleId"
+                                           value="@schedule.ActivityScheduleId" />
                                     <input type="hidden" name="planningId"
                                            value="@Model.PlanningId" />
                                     <button type="submit"

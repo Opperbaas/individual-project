@@ -14,18 +14,19 @@ public sealed class SqlRegistrationRepository : IRegistrationRepository
         _dbContext = dbContext;
     }
 
-    public Task<Activity?> GetActivityForRegistrationAsync(int activityId)
+    public Task<ActivitySchedule?> GetActivityScheduleForRegistrationAsync(int activityScheduleId)
     {
-        return _dbContext.Activities
-            .Include(activity => activity.Registrations)
-            .SingleOrDefaultAsync(activity => activity.ActivityId == activityId);
+        return _dbContext.ActivitySchedules
+            .Include(schedule => schedule.Activity)
+            .Include(schedule => schedule.Registrations)
+            .SingleOrDefaultAsync(schedule => schedule.ActivityScheduleId == activityScheduleId);
     }
 
-    public Task<bool> ExistsAsync(int userId, int activityId)
+    public Task<bool> ExistsAsync(int userId, int activityScheduleId)
     {
         return _dbContext.Registrations.AnyAsync(registration =>
             registration.UserId == userId &&
-            registration.ActivityId == activityId);
+            registration.ActivityScheduleId == activityScheduleId);
     }
 
     public async Task<Registration> CreateAsync(Registration registration)

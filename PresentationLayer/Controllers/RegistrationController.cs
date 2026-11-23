@@ -19,7 +19,7 @@ public sealed class RegistrationController : Controller
     [HttpPost]
     [Authorize(Roles = RoleNames.Participant)]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int activityId, int planningId)
+    public async Task<IActionResult> Create(int activityScheduleId, int planningId)
     {
         if (!int.TryParse(
                 User.FindFirstValue(ClaimTypes.NameIdentifier),
@@ -30,7 +30,7 @@ public sealed class RegistrationController : Controller
 
         try
         {
-            await _registrationService.RegisterAsync(userId, activityId);
+            await _registrationService.RegisterAsync(userId, activityScheduleId);
             TempData["SuccessMessage"] = "Je bent geregistreerd voor de activiteit.";
         }
         catch (ArgumentException exception)

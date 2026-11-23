@@ -12,34 +12,34 @@ public sealed class RegistrationService : IRegistrationService
         _registrationRepository = registrationRepository;
     }
 
-    public async Task<Registration> RegisterAsync(int userId, int activityId)
+    public async Task<Registration> RegisterAsync(int userId, int activityScheduleId)
     {
         if (userId <= 0)
         {
             throw new ArgumentException("De ingelogde gebruiker is ongeldig.", nameof(userId));
         }
 
-        if (activityId <= 0)
+        if (activityScheduleId <= 0)
         {
-            throw new ArgumentException("De activiteit is ongeldig.", nameof(activityId));
+            throw new ArgumentException("De geplande activiteit is ongeldig.", nameof(activityScheduleId));
         }
 
-        var activity = await _registrationRepository
-            .GetActivityForRegistrationAsync(activityId);
+        var schedule = await _registrationRepository
+            .GetActivityScheduleForRegistrationAsync(activityScheduleId);
 
-        if (activity is null)
+        if (schedule is null)
         {
-            throw new InvalidOperationException("De activiteit bestaat niet.");
+            throw new InvalidOperationException("De geplande activiteit bestaat niet.");
         }
 
-        if (await _registrationRepository.ExistsAsync(userId, activityId))
+        if (await _registrationRepository.ExistsAsync(userId, activityScheduleId))
         {
             throw new InvalidOperationException(
                 "Je bent al geregistreerd voor deze activiteit.");
         }
 
-        var participantCount = activity.Registrations.Count;
-        if (participantCount >= activity.MaxParticipants)
+        var participantCount = schedule.Registrations.Count;
+        if (participantCount >= schedule.Activity.MaxParticipants)
         {
             throw new InvalidOperationException(
                 "Deze activiteit zit vol.");
@@ -48,7 +48,7 @@ public sealed class RegistrationService : IRegistrationService
         return await _registrationRepository.CreateAsync(new Registration
         {
             UserId = userId,
-            ActivityId = activityId,
+            ActivityScheduleId = activityScheduleId,
             RegisteredAt = DateTime.UtcNow,
             Status = "Registered"
         });

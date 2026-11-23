@@ -121,13 +121,18 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("Registration");
             entity.HasKey(registration => registration.RegistrationId);
             entity.Property(registration => registration.Status).HasMaxLength(50).IsRequired();
+            entity.HasIndex(registration => new
+            {
+                registration.UserId,
+                registration.ActivityScheduleId
+            }).IsUnique();
             entity.HasOne(registration => registration.User)
                 .WithMany(user => user.Registrations)
                 .HasForeignKey(registration => registration.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne(registration => registration.Activity)
-                .WithMany(activity => activity.Registrations)
-                .HasForeignKey(registration => registration.ActivityId)
+            entity.HasOne(registration => registration.ActivitySchedule)
+                .WithMany(schedule => schedule.Registrations)
+                .HasForeignKey(registration => registration.ActivityScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 

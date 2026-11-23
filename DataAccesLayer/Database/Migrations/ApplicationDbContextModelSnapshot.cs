@@ -142,7 +142,8 @@ namespace DataAccesLayer.Database.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("LocationName");
 
                     b.HasKey("LocationId");
 
@@ -196,7 +197,7 @@ namespace DataAccesLayer.Database.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RegistrationId"));
 
-                    b.Property<int>("ActivityId")
+                    b.Property<int>("ActivityScheduleId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("RegisteredAt")
@@ -212,7 +213,7 @@ namespace DataAccesLayer.Database.Migrations
 
                     b.HasKey("RegistrationId");
 
-                    b.HasIndex("ActivityId");
+                    b.HasIndex("ActivityScheduleId");
 
                     b.HasIndex("UserId");
 
@@ -338,7 +339,7 @@ namespace DataAccesLayer.Database.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AssignmentId"));
 
-                    b.Property<int>("ActivityId")
+                    b.Property<int>("ActivityScheduleId")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
@@ -346,7 +347,7 @@ namespace DataAccesLayer.Database.Migrations
 
                     b.HasKey("AssignmentId");
 
-                    b.HasIndex("ActivityId");
+                    b.HasIndex("ActivityScheduleId");
 
                     b.HasIndex("UserId");
 
@@ -431,9 +432,9 @@ namespace DataAccesLayer.Database.Migrations
 
             modelBuilder.Entity("BusinessLayer.Entities.Registration", b =>
                 {
-                    b.HasOne("BusinessLayer.Entities.Activity", "Activity")
+                    b.HasOne("BusinessLayer.Entities.ActivitySchedule", "ActivitySchedule")
                         .WithMany("Registrations")
-                        .HasForeignKey("ActivityId")
+                        .HasForeignKey("ActivityScheduleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -443,7 +444,7 @@ namespace DataAccesLayer.Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Activity");
+                    b.Navigation("ActivitySchedule");
 
                     b.Navigation("User");
                 });
@@ -472,9 +473,9 @@ namespace DataAccesLayer.Database.Migrations
 
             modelBuilder.Entity("BusinessLayer.Entities.VolunteerAssignment", b =>
                 {
-                    b.HasOne("BusinessLayer.Entities.Activity", "Activity")
+                    b.HasOne("BusinessLayer.Entities.ActivitySchedule", "ActivitySchedule")
                         .WithMany("VolunteerAssignments")
-                        .HasForeignKey("ActivityId")
+                        .HasForeignKey("ActivityScheduleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -484,7 +485,7 @@ namespace DataAccesLayer.Database.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Activity");
+                    b.Navigation("ActivitySchedule");
 
                     b.Navigation("User");
                 });
@@ -492,7 +493,10 @@ namespace DataAccesLayer.Database.Migrations
             modelBuilder.Entity("BusinessLayer.Entities.Activity", b =>
                 {
                     b.Navigation("ActivitySchedules");
+                });
 
+            modelBuilder.Entity("BusinessLayer.Entities.ActivitySchedule", b =>
+                {
                     b.Navigation("Registrations");
 
                     b.Navigation("VolunteerAssignments");
